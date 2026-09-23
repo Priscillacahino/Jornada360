@@ -1,0 +1,11 @@
+file 'linkedin_frames/01.png'
+duration 5
+file 'linkedin_frames/02.png'
+duration 6
+file 'linkedin_frames/03.png'
+duration 6
+file 'linkedin_frames/04.png'
+duration 7
+file 'linkedin_frames/05.png'
+duration 6
+file 'linkedin_frames/05.png'

@@ -1,0 +1,13 @@
+file 'produto_frames/01_dashboard.png'
+duration 6
+file 'produto_frames/02_prioridades.png'
+duration 7
+file 'produto_frames/03_clientes.png'
+duration 5
+file 'produto_frames/04_cliente360.png'
+duration 8
+file 'produto_frames/05_voc.png'
+duration 6
+file 'produto_frames/06_cliente_mobile.png'
+duration 8
+file 'produto_frames/06_cliente_mobile.png'
