@@ -1,38 +1,40 @@
-# Status consolidado — Jornada360
+﻿# Status consolidado â€” Jornada360
 
-## Concluído em especificação
+## ConcluÃ­do em especificaÃ§Ã£o
 - origem profissional e posicionamento do case;
 - problema, escopo e limites;
 - jornada CX e momentos da verdade;
-- personas e cenários;
-- requisitos funcionais/não funcionais;
-- regras de negócio;
-- arquitetura de informação;
-- Journey Health Score explicável;
-- métricas CX/CS;
-- privacidade/LGPD para demonstração;
+- personas e cenÃ¡rios;
+- requisitos funcionais/nÃ£o funcionais;
+- regras de negÃ³cio;
+- arquitetura de informaÃ§Ã£o;
+- Journey Health Score explicÃ¡vel;
+- mÃ©tricas CX/CS;
+- privacidade/LGPD para demonstraÃ§Ã£o;
 - Service Blueprint;
-- esquema e dicionário de dados;
-- critérios de aceite;
+- esquema e dicionÃ¡rio de dados;
+- critÃ©rios de aceite;
 - plano de testes/usabilidade;
 - limites de IA;
-- roteiro do case de portfólio;
+- roteiro do case de portfÃ³lio;
 - wireframes textuais;
-- MVP web local inicial.
+- MVP web local inicial;
+- publicação da estrutura atual no GitHub.
 
-## Pode avançar sem terceiros
-- ampliar massa de dados fictícios;
-- persistência local demonstrativa;
+## Pode avanÃ§ar sem terceiros
+- ampliar massa de dados fictÃ­cios;
+- persistÃªncia local demonstrativa;
 - checklist documental funcional;
 - timeline e tarefas;
-- formulário CSAT/NPS funcional;
-- cálculo programático do Health Score;
+- formulÃ¡rio CSAT/NPS funcional;
+- cÃ¡lculo programÃ¡tico do Health Score;
 - acessibilidade e responsividade;
 - testes automatizados das regras puras;
-- documentação final e pacote de apresentação.
+- documentaÃ§Ã£o final e pacote de apresentaÃ§Ã£o.
 
 ## Mantido para o final
 - acabamento no Figma;
-- publicação no GitHub;
-- publicação web;
-- qualquer integração externa.
+- publicaÃ§Ã£o no GitHub;
+- publicaÃ§Ã£o web;
+- qualquer integraÃ§Ã£o externa.
+
