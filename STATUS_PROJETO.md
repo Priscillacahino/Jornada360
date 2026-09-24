@@ -30,6 +30,8 @@
 - atualização da etapa e da próxima ação;
 - checklist documental funcional;
 - timeline automática da jornada;
+- progresso visual real da jornada com etapa/percentual e legenda;
+- diferenciação entre avanço e retorno de etapa na timeline;
 - Central de Prioridades demonstrativa;
 - Voz do Cliente demonstrativa;
 - experiência mobile demonstrativa;

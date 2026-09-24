@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'jornada360_mvp_v2';
-const STORAGE_VERSION = 2;
+const STORAGE_VERSION = 3;
 
 const stages = [
   'Necessidade',
@@ -52,6 +52,65 @@ function documentStatusLabel(status) {
   })[status] || status;
 }
 
+function getJourneyProgress(c) {
+  const currentIndex = Math.max(0, stages.indexOf(c.stage));
+  const step = currentIndex + 1;
+  const total = stages.length;
+  const percent = Math.round((step / total) * 100);
+  return { currentIndex, step, total, percent };
+}
+
+function normalizeTimelineEvent(event) {
+  const item = { ...event };
+
+  if (
+    item.type === 'stage' &&
+    typeof item.title === 'string' &&
+    item.title.startsWith('Etapa atual:')
+  ) {
+    item.title = item.title.replace('Etapa atual:', 'Etapa registrada:');
+    item.detail = 'Registro histórico da posição da jornada na massa demonstrativa.';
+  }
+
+  if (
+    item.type === 'stage' &&
+    typeof item.title === 'string' &&
+    item.title.startsWith('Etapa alterada para ') &&
+    typeof item.detail === 'string'
+  ) {
+    const newStage = item.title.replace('Etapa alterada para ', '').trim();
+    const oldMatch = item.detail.match(/^Etapa anterior:\s*(.+?)\.?$/);
+    const oldStage = oldMatch ? oldMatch[1].replace(/\.$/, '').trim() : '';
+    const oldIndex = stages.indexOf(oldStage);
+    const newIndex = stages.indexOf(newStage);
+
+    if (oldIndex >= 0 && newIndex >= 0) {
+      if (newIndex < oldIndex) {
+        item.type = 'stage-back';
+        item.title = `Retorno de etapa: ${oldStage} → ${newStage}`;
+        item.detail = 'A jornada retornou para uma etapa anterior. O histórico anterior foi preservado.';
+      } else if (newIndex > oldIndex) {
+        item.type = 'stage-forward';
+        item.title = `Avanço de etapa: ${oldStage} → ${newStage}`;
+        item.detail = 'A jornada avançou para uma nova etapa.';
+      }
+    }
+  }
+
+  return item;
+}
+
+function timelineKindLabel(type) {
+  return ({
+    'stage': 'Histórico de etapa',
+    'stage-forward': 'Avanço de etapa',
+    'stage-back': 'Retorno de etapa',
+    'interaction': 'Interação',
+    'document': 'Documento',
+    'note': 'Observação'
+  })[type] || 'Evento';
+}
+
 function createSeedClient(data, index) {
   const id = `cliente-${index + 1}`;
   const stageIndex = Math.max(0, stages.indexOf(data.stage));
@@ -89,8 +148,10 @@ function createSeedClient(data, index) {
     timeline.push({
       id: uid('evt'),
       type: 'stage',
-      title: i === stageIndex ? `Etapa atual: ${stages[i]}` : `Etapa concluída: ${stages[i]}`,
-      detail: i === stageIndex ? 'Etapa atual da jornada demonstrativa.' : 'Avanço registrado na jornada demonstrativa.',
+      title: i === stageIndex ? `Etapa registrada: ${stages[i]}` : `Etapa concluída: ${stages[i]}`,
+      detail: i === stageIndex
+        ? 'Posição inicial da jornada na massa demonstrativa.'
+        : 'Avanço registrado na jornada demonstrativa.',
       occurredAt: daysAgoISO(Math.max((stageIndex - i) * 5 + data.last, data.last))
     });
   }
@@ -139,7 +200,7 @@ function normalizeClient(client, index = 0) {
     interactions: Array.isArray(client.interactions) ? client.interactions : [],
     documents: Array.isArray(client.documents) ? client.documents : [],
     notes: Array.isArray(client.notes) ? client.notes : [],
-    timeline: Array.isArray(client.timeline) ? client.timeline : []
+    timeline: Array.isArray(client.timeline) ? client.timeline.map(normalizeTimelineEvent) : []
   };
 }
 
@@ -367,11 +428,19 @@ function clientList() {
 }
 
 function journeyMarkup(c) {
-  const currentIndex = Math.max(0, stages.indexOf(c.stage));
-  return stages.map((s, n) => `
-    <div class="stage ${n < currentIndex ? 'done' : n === currentIndex ? 'current' : ''}">
-      <span>${n + 1}</span>${safeText(s)}
-    </div>`).join('');
+  const { currentIndex } = getJourneyProgress(c);
+  return stages.map((s, n) => {
+    const stateClass = n < currentIndex ? 'done' : n === currentIndex ? 'current' : 'upcoming';
+    const stateLabel = n < currentIndex ? 'Concluída' : n === currentIndex ? 'Atual' : 'Próxima';
+    return `
+      <div class="stage ${stateClass}" ${n === currentIndex ? 'aria-current="step"' : ''}>
+        <div class="stage-top">
+          <span class="stage-number">${n + 1}</span>
+          <span class="stage-state">${stateLabel}</span>
+        </div>
+        <b>${safeText(s)}</b>
+      </div>`;
+  }).join('');
 }
 
 function timelineMarkup(c) {
@@ -382,7 +451,8 @@ function timelineMarkup(c) {
     <div class="timeline-item">
       <div class="timeline-dot ${safeText(event.type)}"></div>
       <div>
-        <b>${safeText(event.title)}</b>
+        <span class="timeline-kind ${safeText(event.type)}">${safeText(timelineKindLabel(event.type))}</span>
+        <b class="timeline-title">${safeText(event.title)}</b>
         <p>${safeText(event.detail || '')}</p>
         <span class="small">${formatDate(event.occurredAt)}</span>
       </div>
@@ -466,8 +536,25 @@ function bindClientDetail(c) {
 
     if (newStage !== c.stage) {
       const oldStage = c.stage;
+      const oldIndex = stages.indexOf(oldStage);
+      const newIndex = stages.indexOf(newStage);
       c.stage = newStage;
-      addTimeline(c, 'stage', `Etapa alterada para ${newStage}`, `Etapa anterior: ${oldStage}.`);
+
+      if (newIndex < oldIndex) {
+        addTimeline(
+          c,
+          'stage-back',
+          `Retorno de etapa: ${oldStage} → ${newStage}`,
+          'A jornada retornou para uma etapa anterior. O histórico anterior foi preservado.'
+        );
+      } else {
+        addTimeline(
+          c,
+          'stage-forward',
+          `Avanço de etapa: ${oldStage} → ${newStage}`,
+          'A jornada avançou para uma nova etapa.'
+        );
+      }
     }
     c.next = next;
     saveState();
@@ -529,6 +616,7 @@ function detail(id) {
 
   const days = getDaysSinceLastInteraction(c);
   const latestNotes = [...c.notes].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const progress = getJourneyProgress(c);
 
   layout(`
     <div class="top">
@@ -551,9 +639,27 @@ function detail(id) {
       <div class="section-head">
         <div>
           <h2>Jornada</h2>
-          <p class="small">A alteração de etapa entra automaticamente na timeline.</p>
+          <p class="small">A etapa atual determina o progresso visual. Avanços e retornos ficam registrados na timeline sem apagar o histórico.</p>
         </div>
       </div>
+
+      <div class="journey-progress-summary">
+        <div>
+          <strong>Etapa ${progress.step} de ${progress.total}</strong>
+          <span>${progress.percent}% da jornada percorrida</span>
+        </div>
+        <span class="current-stage-label">Atual: ${safeText(c.stage)}</span>
+      </div>
+      <div class="journey-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress.percent}" aria-label="Progresso da jornada">
+        <i style="width:${progress.percent}%"></i>
+      </div>
+
+      <div class="journey-legend" aria-label="Legenda da jornada">
+        <span><i class="legend-dot done"></i>Concluída</span>
+        <span><i class="legend-dot current"></i>Atual</span>
+        <span><i class="legend-dot upcoming"></i>Próxima</span>
+      </div>
+
       <div class="journey">${journeyMarkup(c)}</div>
 
       <form id="stage-form" class="form-grid stage-editor">
@@ -748,6 +854,7 @@ function cx() {
 function customer() {
   const c = clients[0];
   const activeDocs = c.documents.filter(d => d.status !== 'resolved');
+  const progress = getJourneyProgress(c);
 
   layout(`
     <div class="top">
@@ -762,7 +869,13 @@ function customer() {
         <div class="small">Jornada360</div>
         <h2>Olá, ${safeText(c.name.split(' ')[0])}</h2>
         <p class="small">Sua jornada demonstrativa está em andamento.</p>
-        <div class="progress"><i></i></div>
+        <div class="mobile-progress-label">
+          <span>Etapa ${progress.step} de ${progress.total}</span>
+          <b>${progress.percent}%</b>
+        </div>
+        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress.percent}">
+          <i style="width:${progress.percent}%"></i>
+        </div>
         <p><b>Etapa atual:</b> ${safeText(c.stage)}</p>
 
         <div class="action-box">

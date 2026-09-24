@@ -98,3 +98,19 @@ Não requer instalação, conta, servidor ou serviço externo.
 4. dashboard alimentado pelos próprios dados;
 5. testes funcionais e de acessibilidade;
 6. acabamento visual/Figma e case final.
+
+## Correção de usabilidade da jornada
+
+Após o primeiro teste manual do Cliente 360º, a visualização da jornada foi ajustada para evitar confusão entre posição atual e histórico.
+
+A interface agora apresenta:
+- progresso real calculado pela etapa atual;
+- indicador **Etapa X de 9** e percentual percorrido;
+- barra visual de progresso;
+- legenda clara para **Concluída**, **Atual** e **Próxima**;
+- etapas organizadas em grade, sem uma barra de rolagem que possa ser confundida com progresso;
+- timeline distinguindo **avanço de etapa** e **retorno de etapa**;
+- migração visual de registros anteriores do navegador para retirar a expressão ambígua “Etapa atual” de eventos históricos;
+- progresso dinâmico também na visão mobile do cliente.
+
+O retorno para uma etapa anterior não apaga eventos anteriores. Isso é intencional para preservar a rastreabilidade da jornada.

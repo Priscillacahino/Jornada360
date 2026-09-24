@@ -113,6 +113,8 @@ Além das telas de Dashboard CX/CS, Carteira, Cliente 360º, Central de Priorida
 - alterar a etapa da jornada e a próxima ação;
 - acompanhar e atualizar itens documentais fictícios;
 - visualizar uma timeline com o histórico da jornada.
+- visualizar o progresso real da jornada por etapa e percentual;
+- distinguir avanços e retornos de etapa na timeline;
 
 O Health Score, as métricas consolidadas do dashboard, CSAT/NPS e a priorização automática continuam demonstrativos e serão evoluídos nas próximas etapas.
 
