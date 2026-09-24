@@ -3,7 +3,7 @@
 | Entidade | Campo principal | Finalidade |
 |---|---|---|
 | customers | display_name | Identificação fictícia na demonstração |
-| journeys | current_stage_id | Etapa atual da jornada |
+| journeys | current_stage_id / outcome_status / interruption_reason | Etapa atual e desfecho demonstrativo da jornada |
 | stage_history | entered_at/exited_at | Histórico de evolução |
 | documents | status / guidance / updated_at | Controle documental e orientação |
 | pending_items | customer_action/status | Pendência e ação esperada |

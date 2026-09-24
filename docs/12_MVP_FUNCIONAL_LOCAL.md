@@ -170,3 +170,16 @@ A versão v6 consolida o MVP funcional local:
 
 ### Migração local
 Ao abrir a v6, clientes já alterados no navegador são preservados. Os novos clientes fictícios são acrescentados à massa local e respostas demonstrativas de pesquisa são incluídas apenas quando não existirem respostas anteriores para aquele cliente.
+
+## Desfechos da jornada
+
+O Cliente 360º agora permite registrar:
+- Em andamento;
+- Concluída;
+- Interrompida.
+
+Ao marcar **Interrompida**, o motivo demonstrativo é obrigatório e o evento é registrado na timeline.
+
+Ao marcar **Concluída**, o MVP posiciona a jornada em Pós-atendimento.
+
+A Central de Prioridades considera apenas jornadas ativas. Dashboard e Voz do Cliente calculam conclusão/interrupção separadamente.

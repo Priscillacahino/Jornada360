@@ -75,5 +75,23 @@ assert.strictEqual(metrics.withoutInteraction, 1);
 const item = Priorities.buildPriority(attention, stages, { now: NOW });
 assert.strictEqual(item.nextAction, 'Realizar acompanhamento');
 assert.ok(item.primaryReason.length > 0);
+assert.ok(item.suggestedMessage.length > 0);
+assert.match(item.suggestedMessage, /Cliente B|Olá/);
+
+
+const closed = client('4', 'Cliente Encerrado', {
+  outcomeStatus: 'interrupted',
+  stage: 'Análise',
+  documents: [{ status: 'pending', requestedAt: ago(20), updatedAt: ago(20) }],
+  interactions: [{ occurredAt: ago(20) }],
+  timeline: [{ type: 'stage', occurredAt: ago(20) }]
+});
+
+const listWithClosed = Priorities.buildPriorityList(
+  [healthy, attention, high, closed],
+  stages,
+  { now: NOW }
+);
+assert.ok(!listWithClosed.some(item => item.clientId === '4'));
 
 console.log('Central de Prioridades: todos os testes passaram.');

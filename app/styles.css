@@ -8,3 +8,28 @@
 @media(max-width:900px){.distribution-row{grid-template-columns:170px 1fr}}
 @media(max-width:520px){.distribution-row{grid-template-columns:1fr}.voc-summary-grid{grid-template-columns:1fr}.friction-row>div:first-child{flex-direction:column;gap:2px}.customer-selector{min-width:100%;width:100%}.nps-scale .survey-score{width:34px;height:34px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* MVP v7 — desfechos da jornada e qualidade final */
+.top-badges{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.outcome-badge{display:inline-block;padding:5px 8px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid var(--line)}
+.outcome-badge.active{background:#eef0f7;color:#4b5168}
+.outcome-badge.completed{background:var(--ok);color:#385443}
+.outcome-badge.interrupted{background:var(--high);color:#714257}
+.outcome-form{display:grid;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.outcome-form label{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted)}
+.outcome-form select,.outcome-form textarea{width:100%;border:1px solid var(--line);background:#fff;padding:10px 12px;border-radius:10px}
+.customer-outcome-alert{margin:12px 0;padding:12px 14px;border-radius:12px;background:var(--high);color:#714257}
+.customer-outcome-alert p{margin:5px 0 0;font-size:12px;line-height:1.45}
+.main{min-width:0}.card,.priority-card,.row,.priority-row{overflow-wrap:anywhere}
+button,.btn,.reset-btn,.link-btn,.survey-score{min-height:44px}
+@media(max-width:520px){.top-badges{justify-content:flex-start}.main{padding:16px}.card{padding:16px}.survey{gap:6px}.nps-scale .survey-score{width:36px;height:36px;min-height:36px}}
+@media print{.side,.skip-link,.reset-btn,.toolbar,.btn,.link-btn,.customer-selector{display:none!important}.shell{display:block}.main{max-width:none;padding:0}.card,.priority-card{break-inside:avoid;box-shadow:none}}
+
+.communication-suggestion{margin-top:12px;padding:12px;border-radius:12px;background:#f5f1f6;border:1px solid #e3d9e5}
+.communication-suggestion p{margin:6px 0;font-size:12px;line-height:1.5}
+.communication-suggestion span{font-size:10px;color:var(--muted)}
+.voc-themes{display:grid;gap:8px}
+.voc-theme-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line);font-size:12px}
+.voc-theme-row:first-child{border-top:0}
+.voc-theme-row b{white-space:nowrap}
+.voc-theme-tag{display:inline-block;margin-right:5px;padding:2px 6px;border-radius:999px;background:var(--lilac);color:var(--plum);font-size:9px;font-weight:700}

@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'jornada360_mvp_v2';
-const STORAGE_VERSION = 6;
+const STORAGE_VERSION = 7;
 
 const stages = [
   'Necessidade',
@@ -108,7 +108,8 @@ function timelineKindLabel(type) {
     'interaction': 'Interação',
     'document': 'Documento',
     'note': 'Observação',
-    'survey': 'Pesquisa de experiência'
+    'survey': 'Pesquisa de experiência',
+    'outcome': 'Situação da jornada'
   })[type] || 'Evento';
 }
 
@@ -194,6 +195,10 @@ function createSeedClient(data, index) {
     status: data.status,
     pending: data.pending,
     next: data.next,
+    outcomeStatus: ['active', 'completed', 'interrupted'].includes(data.outcomeStatus)
+      ? data.outcomeStatus
+      : (data.stage === 'Pós-atendimento' ? 'completed' : 'active'),
+    interruptionReason: data.interruptionReason || '',
     interactions,
     documents,
     notes: [],
@@ -205,7 +210,7 @@ function createSeedClient(data, index) {
 const seedData = [
   {name:'Mariana Costa',stage:'Documentação',score:68,status:'attention',last:3,pending:'Comprovante complementar',next:'Confirmar recebimento do documento'},
   {name:'Carlos Mendes',stage:'Documentação',score:42,status:'high',last:11,pending:'Documento pendente há 11 dias',next:'Confirmar dificuldade no envio',csat:2,comment:'Tive dificuldade para entender qual documento ainda faltava.'},
-  {name:'Fernanda Lima',stage:'Análise',score:47,status:'high',last:15,pending:'Sem interação há 15 dias',next:'Realizar contato de acompanhamento',csat:2,comment:'Queria receber atualização mesmo quando ainda estivesse aguardando.'},
+  {name:'Fernanda Lima',stage:'Análise',score:47,status:'high',last:15,pending:'Sem interação há 15 dias',next:'Realizar contato de acompanhamento',outcomeStatus:'interrupted',interruptionReason:'Cliente optou por pausar a jornada neste momento.',csat:2,comment:'Queria receber atualização mesmo quando ainda estivesse aguardando.'},
   {name:'Pedro Alves',stage:'Diagnóstico',score:73,status:'attention',last:2,pending:'Nova solicitação documental',next:'Orientar sobre documento solicitado',csat:4,comment:'A orientação inicial foi clara.'},
   {name:'Ana Ribeiro',stage:'Análise',score:76,status:'attention',last:8,pending:'Etapa sem atualização há 8 dias',next:'Verificar andamento e atualizar status',csat:3},
   {name:'Luiza Rocha',stage:'Preparação para contrato',score:91,status:'healthy',last:1,pending:'Nenhuma',next:'Orientar etapa final',csat:5,comment:'Gostei de saber exatamente o que faltava em cada etapa.'},
@@ -218,7 +223,7 @@ const seedData = [
   {name:'Renata Barbosa',stage:'Diagnóstico',score:79,status:'attention',last:1,pending:'Nenhuma',next:'Concluir diagnóstico inicial',csat:4},
   {name:'André Martins',stage:'Análise',score:82,status:'healthy',last:4,pending:'Nenhuma',next:'Acompanhar retorno da análise',csat:4},
   {name:'Patrícia Gomes',stage:'Primeiro atendimento',score:84,status:'healthy',last:0,pending:'Nenhuma',next:'Realizar diagnóstico inicial'},
-  {name:'Eduardo Lima',stage:'Retorno da instituição',score:61,status:'attention',last:12,pending:'Sem atualização há 12 dias',next:'Retomar acompanhamento',csat:3},
+  {name:'Eduardo Lima',stage:'Retorno da instituição',score:61,status:'attention',last:12,pending:'Sem atualização há 12 dias',next:'Retomar acompanhamento',outcomeStatus:'interrupted',interruptionReason:'Jornada encerrada a pedido do cliente.',csat:3},
   {name:'Sofia Araújo',stage:'Preparação para contrato',score:89,status:'healthy',last:3,pending:'Nenhuma',next:'Orientar documentos para contratação',csat:5},
   {name:'Bruno Costa',stage:'Pós-atendimento',score:91,status:'healthy',last:2,pending:'Nenhuma',next:'Encerrar acompanhamento',csat:4,nps:7},
   {name:'Larissa Melo',stage:'Documentação',score:58,status:'attention',last:6,pending:'Documento complementar',next:'Confirmar envio do documento',csat:3,comment:'A lista de documentos ajudou, mas ainda precisei tirar uma dúvida.'},
@@ -240,6 +245,10 @@ function normalizeClient(client, index = 0) {
     status: ['healthy', 'attention', 'high'].includes(client.status) ? client.status : 'attention',
     pending: client.pending || 'Nenhuma',
     next: client.next || 'Definir próxima ação',
+    outcomeStatus: ['active', 'completed', 'interrupted'].includes(client.outcomeStatus)
+      ? client.outcomeStatus
+      : (client.stage === 'Pós-atendimento' ? 'completed' : 'active'),
+    interruptionReason: client.interruptionReason || '',
     interactions: Array.isArray(client.interactions) ? client.interactions : [],
     documents: Array.isArray(client.documents) ? client.documents : [],
     notes: Array.isArray(client.notes) ? client.notes : [],
@@ -265,6 +274,17 @@ function mergeSeedEnhancements(existingClients, previousVersion = 0) {
 
     if (previousVersion < 6 && current.surveys.length === 0 && seed.surveys.length) {
       current.surveys = JSON.parse(JSON.stringify(seed.surveys));
+    }
+
+    if (
+      previousVersion < 7 &&
+      seed.outcomeStatus === 'interrupted' &&
+      current.outcomeStatus === 'active' &&
+      current.stage === seed.stage &&
+      current.next === seed.next
+    ) {
+      current.outcomeStatus = 'interrupted';
+      current.interruptionReason = seed.interruptionReason || 'Jornada interrompida na massa demonstrativa.';
     }
   });
 
@@ -341,6 +361,18 @@ function badge(c) {
   }</span>`;
 }
 
+function outcomeLabel(status) {
+  return ({
+    active: 'Em andamento',
+    completed: 'Concluída',
+    interrupted: 'Interrompida'
+  })[status] || 'Em andamento';
+}
+
+function outcomeBadge(c) {
+  return `<span class="outcome-badge ${safeText(c.outcomeStatus || 'active')}">${safeText(outcomeLabel(c.outcomeStatus))}</span>`;
+}
+
 function getClient(id) {
   return clients.find(c => c.id === id);
 }
@@ -391,6 +423,7 @@ function getPortfolioAnalytics() {
     frictions: JornadaAnalytics.frictionMetrics(clients, stages),
     stages: JornadaAnalytics.stageDistribution(clients, stages),
     insight: JornadaAnalytics.buildPortfolioInsight(clients, stages),
+    themes: JornadaAnalytics.vocThemeMetrics(clients),
     comments: JornadaAnalytics.recentComments(clients, 8)
   };
 }
@@ -492,6 +525,11 @@ function priorityCardMarkup(item, compact = false) {
       <details class="priority-details">
         <summary>Ver fatores que explicam a prioridade</summary>
         ${priorityReasonsMarkup(item)}
+        <div class="communication-suggestion">
+          <b>Sugestão de abordagem</b>
+          <p>${safeText(item.suggestedMessage)}</p>
+          <span>Texto demonstrativo de apoio. Revise antes de usar; nenhuma mensagem é enviada automaticamente.</span>
+        </div>
       </details>
     </article>
   `;
@@ -552,6 +590,7 @@ function layout(content) {
       view = button.dataset.v;
       currentClientId = null;
       render();
+      window.requestAnimationFrame(() => document.querySelector('#main-content')?.focus());
     };
   });
 
@@ -571,12 +610,12 @@ function dashboard() {
         <h1>Visão geral da carteira</h1>
         <p class="sub">Indicadores calculados a partir da carteira fictícia salva neste navegador.</p>
       </div>
-      <span class="pill">${p.total} clientes fictícios • dados locais</span>
+      <span class="pill">${p.total} clientes fictícios • ${p.active} jornada(s) ativa(s)</span>
     </div>
 
     <section class="grid4" aria-label="Indicadores da carteira">
-      <div class="card metric"><strong>${p.total}</strong><span>Clientes na carteira</span></div>
-      <div class="card metric"><strong>${p.healthy}</strong><span>Jornadas saudáveis</span></div>
+      <div class="card metric"><strong>${p.active}</strong><span>Jornadas ativas</span></div>
+      <div class="card metric"><strong>${p.healthy}</strong><span>Jornadas saudáveis ativas</span></div>
       <div class="card metric"><strong>${p.attention}</strong><span>Em atenção</span></div>
       <div class="card metric"><strong>${p.high}</strong><span>Necessitam acompanhamento</span></div>
     </section>
@@ -621,8 +660,8 @@ function dashboard() {
         <div class="voc-summary-grid">
           <div><strong>${survey.csatAverage === null ? '—' : `${survey.csatAverage.toFixed(1).replace('.', ',')}/5`}</strong><span>CSAT • ${survey.csatCount} resposta(s)</span></div>
           <div><strong>${formatNps(survey.nps)}</strong><span>NPS • ${survey.npsCount} resposta(s)</span></div>
-          <div><strong>${survey.completionRate}%</strong><span>Jornadas em pós-atendimento</span></div>
-          <div><strong>${survey.totalResponses}</strong><span>Respostas registradas</span></div>
+          <div><strong>${survey.completionRate}%</strong><span>Conclusão entre jornadas encerradas</span></div>
+          <div><strong>${survey.interruptionRate}%</strong><span>Interrupção entre jornadas encerradas</span></div>
         </div>
       </div>
     </section>
@@ -649,7 +688,7 @@ function clientList() {
         <option value="healthy">Saudável</option>
       </select>
     </div>
-    <div class="card" id="list"></div>
+    <div class="card" id="list" role="region" aria-live="polite" aria-label="Resultados da carteira"></div>
   `);
 
   const draw = () => {
@@ -665,7 +704,7 @@ function clientList() {
           const days = getDaysSinceLastInteraction(c);
           return `
             <div class="row">
-              <div><b>${safeText(c.name)}</b><div class="small">${safeText(c.stage)}</div></div>
+              <div><b>${safeText(c.name)}</b><div class="small">${safeText(c.stage)} • ${safeText(outcomeLabel(c.outcomeStatus))}</div></div>
               <div>
                 Health ${c.score}/100
                 <div class="small">${safeText(c.pending)} • ${days === null ? 'sem interação' : `${days} dia(s) desde a última interação`}</div>
@@ -842,6 +881,51 @@ function bindClientDetail(c) {
     };
   });
 
+  const outcomeForm = document.querySelector('#outcome-form');
+  if (outcomeForm) {
+    outcomeForm.onsubmit = event => {
+      event.preventDefault();
+      const status = document.querySelector('#outcome-status').value;
+      const reason = document.querySelector('#interruption-reason').value.trim();
+
+      if (status === 'interrupted' && !reason) {
+        const feedback = document.querySelector('#outcome-feedback');
+        if (feedback) feedback.textContent = 'Informe um motivo demonstrativo para registrar a interrupção.';
+        return;
+      }
+
+      const previous = c.outcomeStatus || 'active';
+      const previousReason = c.interruptionReason || '';
+      c.outcomeStatus = status;
+      c.interruptionReason = status === 'interrupted' ? reason : '';
+
+      if (status === 'completed' && c.stage !== 'Pós-atendimento') {
+        const oldStage = c.stage;
+        c.stage = 'Pós-atendimento';
+        addTimeline(
+          c,
+          'stage-forward',
+          `Avanço de etapa: ${oldStage} → Pós-atendimento`,
+          'A jornada foi marcada como concluída e avançou para o pós-atendimento.'
+        );
+      }
+
+      if (previous !== status || (status === 'interrupted' && previousReason !== reason)) {
+        addTimeline(
+          c,
+          'outcome',
+          `Situação da jornada: ${outcomeLabel(status)}`,
+          status === 'interrupted'
+            ? `Motivo: ${reason}`
+            : `Situação anterior: ${outcomeLabel(previous)}.`
+        );
+      }
+
+      saveState();
+      detail(c.id);
+    };
+  }
+
   const addDocumentForm = document.querySelector('#add-document-form');
   addDocumentForm.onsubmit = event => {
     event.preventDefault();
@@ -884,7 +968,7 @@ function detail(id) {
         <h1>Cliente 360º — ${safeText(c.name)}</h1>
         <p class="sub">Visão da experiência e do acompanhamento. Não é análise de crédito.</p>
       </div>
-      ${badge(c)}
+      <div class="top-badges">${badge(c)} ${outcomeBadge(c)}</div>
     </div>
 
     <div class="grid4">
@@ -980,6 +1064,25 @@ function detail(id) {
         <div class="reason"><b>Pendência:</b><br>${safeText(c.pending)}</div>
         <div class="reason"><b>Próxima ação:</b><br>${safeText(c.next)}</div>
         <div class="reason"><b>Interações registradas:</b><br>${c.interactions.length}</div>
+        ${c.outcomeStatus === 'interrupted' ? `<div class="reason"><b>Motivo da interrupção:</b><br>${safeText(c.interruptionReason || 'Não informado')}</div>` : ''}
+
+        <form id="outcome-form" class="outcome-form">
+          <label>
+            Situação da jornada
+            <select id="outcome-status">
+              <option value="active" ${c.outcomeStatus === 'active' ? 'selected' : ''}>Em andamento</option>
+              <option value="completed" ${c.outcomeStatus === 'completed' ? 'selected' : ''}>Concluída</option>
+              <option value="interrupted" ${c.outcomeStatus === 'interrupted' ? 'selected' : ''}>Interrompida</option>
+            </select>
+          </label>
+          <label>
+            Motivo da interrupção
+            <textarea id="interruption-reason" rows="2" maxlength="220" placeholder="Obrigatório apenas quando a jornada for interrompida">${safeText(c.interruptionReason || '')}</textarea>
+          </label>
+          <button class="btn" type="submit">Salvar situação</button>
+          <div id="outcome-feedback" class="small" aria-live="polite"></div>
+        </form>
+
         <p class="small">As alterações desta versão ficam somente no navegador utilizado para a demonstração.</p>
       </div>
     </section>
@@ -1083,7 +1186,7 @@ function priorities() {
       </select>
     </div>
 
-    <div id="priority-list" class="priority-list"></div>
+    <div id="priority-list" class="priority-list" role="region" aria-live="polite" aria-label="Lista de prioridades"></div>
 
     <p class="notice">
       A prioridade indica necessidade de acompanhamento de CX/CS. Ela não representa risco de crédito,
@@ -1120,6 +1223,7 @@ function cx() {
   const analytics = getPortfolioAnalytics();
   const survey = analytics.surveys;
   const frictions = analytics.frictions;
+  const themes = analytics.themes;
   const comments = analytics.comments;
 
   layout(`
@@ -1133,8 +1237,8 @@ function cx() {
     <div class="grid4">
       <div class="card metric"><strong>${survey.csatAverage === null ? '—' : `${survey.csatAverage.toFixed(1).replace('.', ',')}/5`}</strong><span>CSAT • ${survey.csatCount} resposta(s)</span></div>
       <div class="card metric"><strong>${formatNps(survey.nps)}</strong><span>NPS • ${survey.npsCount} resposta(s)</span></div>
-      <div class="card metric"><strong>${survey.completionRate}%</strong><span>Jornadas em pós-atendimento</span></div>
-      <div class="card metric"><strong>${survey.totalResponses}</strong><span>Respostas CSAT + NPS</span></div>
+      <div class="card metric"><strong>${survey.completionRate}%</strong><span>Conclusão entre jornadas encerradas</span></div>
+      <div class="card metric"><strong>${survey.interruptionRate}%</strong><span>Interrupção entre jornadas encerradas</span></div>
     </div>
     <section class="cols">
       <div class="card">
@@ -1148,11 +1252,21 @@ function cx() {
         <p class="small">Os atritos são derivados dos fatores do Journey Health Score; não usam atributos pessoais ou critérios de crédito.</p>
       </div>
       <div class="card">
-        <h2>Comentários fictícios recentes</h2>
+        <h2>Temas da Voz do Cliente</h2>
+        <div class="voc-themes">
+          ${themes.length ? themes.map(item => `
+            <div class="voc-theme-row">
+              <span>${safeText(item.category)}</span>
+              <b>${item.count} • ${item.percent}%</b>
+            </div>
+          `).join('') : '<p class="small">Nenhum comentário classificado.</p>'}
+        </div>
+
+        <h2 class="section-space">Comentários fictícios recentes</h2>
         ${comments.length ? comments.map(item => `
           <blockquote class="voc-comment">
             <p>“${safeText(item.comment)}”</p>
-            <footer>${safeText(item.clientName)} • ${item.type.toUpperCase()} ${item.score}${item.type === 'csat' ? '/5' : '/10'} • ${formatDate(item.answeredAt)}</footer>
+            <footer><span class="voc-theme-tag">${safeText(item.category)}</span> ${safeText(item.clientName)} • ${item.type.toUpperCase()} ${item.score}${item.type === 'csat' ? '/5' : '/10'} • ${formatDate(item.answeredAt)}</footer>
           </blockquote>
         `).join('') : '<div class="empty">Nenhum comentário registrado.</div>'}
       </div>
@@ -1190,7 +1304,8 @@ function customer() {
       <div class="phone">
         <div class="small">Jornada360</div>
         <h2>Olá, ${safeText(c.name.split(' ')[0])}</h2>
-        <p class="small">Sua jornada demonstrativa está em andamento.</p>
+        <p class="small">Situação demonstrativa: <b>${safeText(outcomeLabel(c.outcomeStatus))}</b>.</p>
+        ${c.outcomeStatus === 'interrupted' ? `<div class="customer-outcome-alert"><b>Jornada interrompida</b><p>${safeText(c.interruptionReason || 'Motivo não informado.')}</p></div>` : ''}
         <div class="mobile-progress-label">
           <span>Etapa ${progress.step} de ${progress.total}</span>
           <b>${progress.percent}%</b>
@@ -1228,7 +1343,7 @@ function customer() {
           </form>
         </section>
 
-        ${c.stage === 'Pós-atendimento' ? `
+        ${c.outcomeStatus === 'completed' ? `
           <section class="mobile-survey-section">
             <h3>Você recomendaria esta experiência?</h3>
             <p class="small">NPS • escolha uma nota de 0 a 10.</p>
@@ -1246,7 +1361,7 @@ function customer() {
         ` : `
           <div class="survey-locked">
             <b>NPS no encerramento</b>
-            <p class="small">A pesquisa NPS fica disponível quando a jornada chega ao pós-atendimento.</p>
+            <p class="small">A pesquisa NPS fica disponível quando a jornada é marcada como concluída.</p>
           </div>
         `}
 

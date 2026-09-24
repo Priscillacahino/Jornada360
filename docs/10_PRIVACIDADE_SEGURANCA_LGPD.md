@@ -33,3 +33,23 @@ Prioriza indicadores agregados; dados individualizados só aparecem quando neces
 
 ## Avisos de interface
 Toda simulação deve informar que é demonstrativa e não representa proposta, aprovação ou decisão de instituição financeira.
+
+## Persistência local e limites
+
+O MVP utiliza `localStorage` apenas para preservar alterações demonstrativas no navegador.
+
+Isso significa que:
+- não há autenticação real;
+- não há criptografia de banco de dados;
+- não há sincronização entre dispositivos;
+- não há recuperação de senha;
+- não há armazenamento de documentos reais;
+- limpar os dados do navegador pode apagar as alterações locais.
+
+Por esse motivo, a versão de portfólio deve permanecer restrita a dados fictícios.
+
+## Desfechos da jornada
+
+O estado **Interrompida** registra somente um motivo demonstrativo de interrupção. Esse campo não deve receber dados sensíveis, justificativas médicas, dados financeiros ou informações pessoais desnecessárias.
+
+A taxa de interrupção é um indicador de experiência/processo e não deve ser usada para inferir risco de crédito ou elegibilidade.

@@ -46,6 +46,21 @@
     });
   }
 
+  function communicationSuggestion(client, primaryFactor, nextAction) {
+    const firstName = String(client.name || 'cliente').split(' ')[0];
+    const templates = {
+      'Situação documental': `Olá, ${firstName}. Estou acompanhando sua jornada e quero confirmar se a orientação sobre a documentação ficou clara. Próximo passo: ${nextAction}.`,
+      'Pendências': `Olá, ${firstName}. Estou entrando em contato para ajudar com a pendência atual e confirmar se existe alguma dificuldade. Próximo passo: ${nextAction}.`,
+      'Interação / engajamento': `Olá, ${firstName}. Estou retomando nosso acompanhamento para que você tenha clareza sobre a situação atual. Próximo passo: ${nextAction}.`,
+      'Atualização da jornada': `Olá, ${firstName}. Passando para manter você atualizado sobre a jornada e alinhar o próximo passo: ${nextAction}.`,
+      'Evolução da jornada': `Olá, ${firstName}. Quero revisar com você em que ponto a jornada está e combinar a próxima ação: ${nextAction}.`,
+      'Satisfação': `Olá, ${firstName}. Obrigado pelo feedback. Quero entender melhor sua experiência e verificar como podemos melhorar o acompanhamento.`
+    };
+
+    return templates[primaryFactor] ||
+      `Olá, ${firstName}. Estou acompanhando sua jornada e quero alinhar o próximo passo: ${nextAction}.`;
+  }
+
   function buildPriority(client, stages, options = {}) {
     const now = options.now || Date.now();
     const health = options.health ||
@@ -79,14 +94,19 @@
       activeDocuments: activeDocumentCount(client),
       daysWithoutInteraction,
       nextAction: (client.next || '').trim() || 'Definir próxima ação',
+      suggestedMessage: communicationSuggestion(
+        client,
+        primary ? primary.label : 'Jornada saudável',
+        (client.next || '').trim() || 'Definir próxima ação'
+      ),
       health
     };
   }
 
   function buildPriorityList(clients, stages, options = {}) {
-    const list = (clients || []).map(client =>
-      buildPriority(client, stages, options)
-    );
+    const list = (clients || [])
+      .filter(client => !client.outcomeStatus || client.outcomeStatus === 'active')
+      .map(client => buildPriority(client, stages, options));
 
     return list.sort((a, b) => {
       const status = statusRank(a.status) - statusRank(b.status);
@@ -119,6 +139,7 @@
   }
 
   const api = {
+    communicationSuggestion,
     buildPriority,
     buildPriorityList,
     priorityMetrics

@@ -41,13 +41,19 @@
 - indicadores CSAT/NPS e atritos calculados dinamicamente;
 - melhorias de acessibilidade (foco visível, skip link, ARIA e redução de movimento);
 - testes automatizados integrados com `npm test` e GitHub Actions;
+- situação da jornada com estados Em andamento, Concluída e Interrompida;
+- motivo demonstrativo obrigatório para interrupção;
+- taxas de conclusão e interrupção calculadas a partir das jornadas encerradas;
+- Central de Prioridades restrita às jornadas ativas;
+- auditoria automatizada de qualidade, acessibilidade e conteúdo seguro;
+- classificação determinística de comentários da Voz do Cliente;
+- sugestões demonstrativas de abordagem na Central de Prioridades, sem envio automático;
 
 ## Próxima evolução sem terceiros
-- revisão final de acessibilidade e responsividade;
-- ampliar cobertura de testes automatizados;
-- documentação final e pacote de apresentação.
+- acabamento documental do case de portfólio;
+- preparação de imagens finais e roteiro de demonstração.
 
-## Mantido para o final
-- acabamento no Figma;
-- publicação web;
-- qualquer integração externa.
+## Dependente de validação humana/externa
+- teste de usabilidade com participantes;
+- revisão visual final no Figma;
+- publicação web.

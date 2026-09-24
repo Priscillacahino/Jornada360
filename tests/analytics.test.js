@@ -33,23 +33,41 @@ const clients = [
 ];
 
 const portfolio = Analytics.portfolioMetrics(clients);
-assert.deepStrictEqual(portfolio, { total:3, healthy:1, attention:1, high:1 });
+assert.deepStrictEqual(portfolio, {
+  total:3,
+  active:2,
+  completed:1,
+  interrupted:0,
+  healthy:0,
+  attention:1,
+  high:1
+});
 
 const survey = Analytics.surveyMetrics(clients);
 assert.strictEqual(survey.csatAverage, 4);
 assert.strictEqual(survey.csatCount, 2);
 assert.strictEqual(survey.npsCount, 2);
 assert.strictEqual(survey.nps, 0);
-assert.strictEqual(survey.completionRate, 33);
+assert.strictEqual(survey.completionRate, 100);
+assert.strictEqual(survey.interruptionRate, 0);
 assert.strictEqual(survey.totalResponses, 4);
 
 const dist = Analytics.stageDistribution(clients, stages);
-assert.strictEqual(dist.find(x => x.stage === 'Pós-atendimento').count, 1);
-assert.strictEqual(dist.reduce((sum,x)=>sum+x.count,0), 3);
+assert.strictEqual(dist.find(x => x.stage === 'Pós-atendimento').count, 0);
+assert.strictEqual(dist.reduce((sum,x)=>sum+x.count,0), 2);
 
 const comments = Analytics.recentComments(clients, 5);
 assert.strictEqual(comments.length, 3);
 assert.strictEqual(comments[0].clientName, 'A');
+
+
+assert.strictEqual(Analytics.classifyVocComment('Tive dificuldade com o documento solicitado.'), 'Dificuldade documental');
+assert.strictEqual(Analytics.classifyVocComment('Queria receber atualização do status.'), 'Comunicação / status');
+assert.strictEqual(Analytics.classifyVocComment('A espera demorou bastante.'), 'Tempo de espera');
+
+const themes = Analytics.vocThemeMetrics(clients);
+assert.ok(themes.length >= 2);
+assert.strictEqual(themes.reduce((sum,item)=>sum+item.count,0), 3);
 
 const frictions = Analytics.frictionMetrics(clients, stages, { now: NOW });
 assert.ok(frictions.length > 0);

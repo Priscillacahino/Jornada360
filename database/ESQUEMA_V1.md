@@ -7,7 +7,7 @@ id, name, role, email_demo, active
 id, display_name, created_at, status
 
 ## journeys
-id, customer_id, current_stage_id, progress_percent, started_at, ended_at, outcome_status
+id, customer_id, current_stage_id, progress_percent, started_at, ended_at, outcome_status, interruption_reason
 
 ## journey_stages
 id, code, label, sequence, customer_description
@@ -49,10 +49,11 @@ journey 1:N documents/pending_items/interactions/notes/tasks/surveys/health_snap
 
 journey N:1 current_stage
 
-## Mapeamento do MVP local v6
+## Mapeamento do MVP local v7
 
 Na versão local demonstrativa, `localStorage` representa temporariamente uma estrutura agregada por cliente contendo:
 - jornada atual;
+- situação/desfecho da jornada;
 - interações;
 - documentos;
 - observações;

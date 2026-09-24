@@ -80,3 +80,28 @@ Testes manuais adicionais:
 8. navegar por teclado e verificar foco visível.
 
 Teste consolidado: `npm test`.
+
+## Desfechos e auditoria final
+
+Testes funcionais adicionais:
+1. marcar uma jornada como **Interrompida** e exigir um motivo;
+2. confirmar que a jornada interrompida deixa a Central de Prioridades;
+3. marcar uma jornada como **Concluída** e confirmar avanço para Pós-atendimento;
+4. conferir as taxas de conclusão e interrupção na Voz do Cliente;
+5. confirmar que jornadas encerradas não distorcem os atritos da carteira ativa;
+6. verificar que NPS é disponibilizado para jornadas concluídas;
+7. testar o MVP em largura de celular e com zoom elevado;
+8. navegar apenas por teclado e confirmar foco visível.
+
+Testes automatizados consolidados:
+- `tests/health-score.test.js`;
+- `tests/priorities.test.js`;
+- `tests/analytics.test.js`;
+- `tests/outcomes.test.js`;
+- `tests/quality.test.js`.
+
+Executar todos com:
+
+`npm test`
+
+A auditoria de qualidade também verifica presença de recursos básicos de acessibilidade, mensagens de segurança e ausência de campos sensíveis na massa fictícia padrão.

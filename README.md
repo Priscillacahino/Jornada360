@@ -75,7 +75,7 @@ Necessidade → Primeiro atendimento → Diagnóstico inicial → Documentação
 
 🟡 Em desenvolvimento — fundação e especificação concluídas; MVP funcional local em evolução.
 
-A versão atual já possui **persistência local**, **Cliente 360º interativo**, **checklist documental**, **timeline**, **Journey Health Score automático**, **Central de Prioridades dinâmica**, **Dashboard calculado pela carteira** e **CSAT/NPS funcionais**. O Figma permanece adiado para a etapa final de acabamento visual.
+A versão atual já possui **persistência local**, **Cliente 360º interativo**, **checklist documental**, **timeline**, **Journey Health Score automático**, **Central de Prioridades dinâmica**, **Dashboard calculado pela carteira**, **CSAT/NPS funcionais** e **registro de conclusão/interrupção da jornada**. O Figma permanece adiado para a etapa final de acabamento visual.
 
 ## Documentação já estruturada
 
@@ -120,12 +120,28 @@ Além das telas de Dashboard CX/CS, Carteira, Cliente 360º, Central de Priorida
 - calcular o Dashboard com os dados da própria carteira;
 - registrar CSAT/NPS e comentários fictícios na visão do cliente;
 - consolidar Voz do Cliente e atritos a partir dos registros locais;
+- registrar situação da jornada como em andamento, concluída ou interrompida, com motivo demonstrativo quando aplicável;
+- calcular taxas de conclusão e interrupção entre jornadas encerradas;
+- classificar comentários fictícios da Voz do Cliente por tema;
+- gerar sugestões demonstrativas de abordagem para acompanhamento, sem envio automático;
 - executar testes automatizados por `npm test`;
 
-O Journey Health Score já é recalculado automaticamente e exibe os fatores que compõem a pontuação. A Central de Prioridades, o Dashboard e a Voz do Cliente já usam os dados do próprio MVP. CSAT e NPS podem ser registrados na visão mobile e permanecem salvos localmente. A massa demonstrativa foi ampliada para 24 clientes fictícios e há testes automatizados das regras principais.
+O Journey Health Score já é recalculado automaticamente e exibe os fatores que compõem a pontuação. A Central de Prioridades, o Dashboard e a Voz do Cliente já usam os dados do próprio MVP. CSAT e NPS podem ser registrados na visão mobile e permanecem salvos localmente. A massa demonstrativa foi ampliada para 24 clientes fictícios, incluindo jornadas concluídas e interrompidas para validar os indicadores de desfecho. A suíte automatizada cobre Health Score, prioridades, analytics, desfechos e verificações de qualidade/acessibilidade.
 
 O Figma será retomado apenas no acabamento final, após os fluxos e regras estarem consolidados.
 
 ## Testes automatizados
 
 Na raiz do projeto, execute `npm test`. O repositório também inclui um workflow do GitHub Actions para validar as regras principais a cada push ou pull request para `main`.
+
+## Qualidade e segurança do MVP
+
+A versão atual inclui verificações automatizadas para confirmar:
+- uso exclusivo de massa demonstrativa fictícia;
+- ausência de campos pessoais/sensíveis na massa padrão;
+- mensagens explícitas separando CX/CS de decisão financeira;
+- carregamento local dos scripts e estilos do MVP;
+- recursos básicos de acessibilidade, como `skip link`, foco visível, ARIA e redução de movimento;
+- comportamento de jornadas ativas, concluídas e interrompidas.
+
+A validação automatizada pode ser executada com `npm test`.
