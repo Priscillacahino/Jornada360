@@ -1,147 +1,160 @@
 # Jornada360
 
-**Customer Experience aplicado à jornada de financiamento habitacional**
+**Customer Experience e Customer Success aplicados à jornada de financiamento habitacional**
 
-Projeto independente e demonstrativo de portfólio, criado a partir da minha experiência profissional no acompanhamento da jornada de financiamento habitacional e reinterpretado sob a perspectiva de Customer Experience (CX), Customer Success (CS) e tecnologia.
+Projeto independente e demonstrativo de portfólio, criado a partir de experiência profissional real no acompanhamento da jornada habitacional e reinterpretado sob a perspectiva de **CX, CS, operações, processos e tecnologia**.
 
-> Este projeto não representa, não integra e não possui vínculo institucional com a CAIXA ou qualquer outra instituição financeira. Todos os dados utilizados serão fictícios.
+> O Jornada360 não representa, não integra e não possui vínculo institucional com a CAIXA ou qualquer outra instituição financeira. Todos os clientes, nomes, documentos, métricas, pontuações, comentários e registros do MVP são fictícios.
 
-## Da minha trajetória profissional ao Jornada360
+## O problema
 
-O projeto nasceu da minha vivência no setor financeiro. Durante minha atuação, acompanhei clientes desde o primeiro atendimento e entendimento da necessidade, passando por orientação e conferência documental, análise de crédito e risco dentro das atribuições da função, acompanhamento de retornos e pendências e preparação do processo para contratação.
+Uma jornada de financiamento envolve etapas, documentos, períodos de espera e diversos contatos. Mesmo quando a operação está em andamento, o cliente pode perceber falta de clareza sobre:
 
-Ao revisitar essa trajetória, percebi que existia uma jornada de experiência acontecendo paralelamente à operação: expectativa, dúvidas, espera, necessidade de informação, confiança e acompanhamento. O Jornada360 transforma esse aprendizado em um estudo de caso de CX/CS apoiado por tecnologia.
+- em que etapa está;
+- se precisa fazer algo;
+- o que está pendente;
+- qual será o próximo passo;
+- quando receberá uma nova atualização.
 
-**A experiência profissional que originou o problema é real. Os clientes, nomes, documentos, indicadores, pontuações, comentários e registros usados na demonstração são fictícios.** O projeto não reproduz sistemas, bases de dados, critérios proprietários ou processos internos de nenhuma instituição financeira.
+Para quem acompanha várias jornadas ao mesmo tempo, também existe o desafio de organizar histórico, priorizar contatos e identificar pontos de atrito.
 
-## Problema
+## A proposta
 
-A jornada de financiamento habitacional envolve várias etapas, documentos, períodos de espera e interações. Para o cliente, isso pode gerar dúvidas sobre o andamento, pendências e próximos passos. Para o profissional, acompanhar vários processos simultaneamente exige organização e priorização.
+O Jornada360 organiza a experiência em duas perspectivas:
 
-## Proposta
+**Profissional de CX/CS**
+- Dashboard calculado com a própria carteira;
+- carteira de clientes fictícios;
+- Cliente 360º;
+- Journey Health Score automático e explicável;
+- Central de Prioridades;
+- checklist documental;
+- timeline;
+- Voz do Cliente;
+- CSAT e NPS;
+- conclusão e interrupção da jornada.
 
-O Jornada360 organiza a jornada desde o primeiro atendimento até o pós-contratação, oferecendo duas perspectivas:
+**Cliente**
+- etapa atual;
+- progresso da jornada;
+- ação necessária;
+- próximo passo;
+- pesquisa de satisfação.
 
-- **Cliente:** acompanha etapas, pendências, documentos e orientações.
-- **Profissional:** acompanha carteira, prioridades, histórico, saúde da jornada e indicadores de experiência.
+## Pergunta de projeto
 
-## Objetivo de CX
-
-Tornar a jornada mais clara, previsível e acompanhada, reduzindo incertezas e facilitando a comunicação.
-
-## Objetivo de Customer Success
-
-Acompanhar proativamente a evolução de cada cliente e identificar sinais de paralisação ou abandono antes que a jornada seja interrompida.
+**Como transformar uma jornada operacional complexa em uma experiência mais clara, acompanhável e orientada ao próximo passo?**
 
 ## Jornada macro
 
-Necessidade → Primeiro atendimento → Diagnóstico inicial → Documentação → Análise → Retorno da instituição → Preparação para contratação → Contratação → Pós-atendimento
+Necessidade → Primeiro atendimento → Diagnóstico → Documentação → Análise → Retorno da instituição → Preparação para contrato → Contratação → Pós-atendimento
 
-## MVP planejado
+## O que já está funcional
 
-1. Login demonstrativo
-2. Dashboard do profissional
-3. Carteira de clientes
-4. Cliente 360º
-5. Checklist documental
-6. Jornada/status
-7. Central de prioridades
-8. Journey Health Score
-9. Pesquisa CSAT/NPS
-10. Dashboard CX
+O MVP local possui:
 
-## Indicadores previstos
+- persistência em `localStorage`;
+- 24 clientes fictícios na massa demonstrativa;
+- busca e filtros;
+- Cliente 360º interativo;
+- registro de interações e observações;
+- atualização de etapa e próxima ação;
+- checklist documental;
+- timeline automática;
+- progresso visual da jornada;
+- Journey Health Score programático e explicável;
+- Central de Prioridades dinâmica;
+- sugestões demonstrativas de abordagem, sem envio automático;
+- Dashboard alimentado pelos próprios dados;
+- CSAT e NPS funcionais;
+- classificação determinística de comentários da Voz do Cliente;
+- registro de jornadas concluídas e interrompidas;
+- taxas de conclusão e interrupção;
+- tela **Sobre o case** para apresentação do projeto;
+- acessibilidade básica e responsividade;
+- testes automatizados executados por `npm test`;
+- workflow do GitHub Actions.
 
-- Journey Health Score
-- CSAT
-- NPS
-- tempo médio por etapa
-- processos sem interação
-- pendências por categoria
-- taxa de conclusão da jornada
-- taxa de interrupção/abandono
-- principais pontos de atrito
+## Journey Health Score
 
-## Limites do projeto
+O Health Score mede **saúde da jornada de acompanhamento**, considerando evolução, situação documental, pendências, interação, atualização da jornada e satisfação.
+
+Ele **não é score de crédito**, não estima risco financeiro, não determina elegibilidade e não participa de aprovação ou reprovação.
+
+## Central de Prioridades
+
+A Central usa fatores do próprio Health Score para organizar jornadas ativas que precisam de acompanhamento. Cada sinalização apresenta motivo e próxima ação, mantendo a decisão com o profissional.
+
+## Voz do Cliente
+
+CSAT, NPS e comentários fictícios ajudam a demonstrar como feedback pode ser transformado em aprendizado de CX. Os comentários são agrupados por temas simples e transparentes, sem uso de IA externa.
+
+## Privacidade e limites
+
+O projeto:
 
 - não realiza aprovação de crédito;
 - não substitui análise de instituição financeira;
 - não promete concessão de financiamento;
 - não utiliza dados reais de clientes;
+- não armazena CPF, RG, renda, endereço, biometria ou documentos pessoais reais;
 - não reproduz critérios proprietários de instituições financeiras;
-- IA, quando incorporada, será apenas ferramenta de apoio.
+- não envia mensagens automaticamente;
+- mantém qualquer apoio automatizado restrito a CX/CS.
+
+## Tecnologias
+
+- HTML
+- CSS
+- JavaScript
+- `localStorage`
+- Node.js para testes
+- Git/GitHub
+- GitHub Actions
+
+## Como executar
+
+Abra `app/index.html` no navegador.
+
+Para executar os testes:
+
+```bash
+npm test
+```
+
+## Estrutura principal
+
+```text
+app/        aplicação local
+tests/      testes automatizados
+docs/       documentação de produto, CX/CS, qualidade e portfólio
+database/   modelo lógico e dicionário de dados
+.github/    validação automática
+```
 
 ## Status
 
-🟡 Em desenvolvimento — fundação e especificação concluídas; MVP funcional local em evolução.
+**MVP funcional local concluído.**
 
-A versão atual já possui **persistência local**, **Cliente 360º interativo**, **checklist documental**, **timeline**, **Journey Health Score automático**, **Central de Prioridades dinâmica**, **Dashboard calculado pela carteira**, **CSAT/NPS funcionais** e **registro de conclusão/interrupção da jornada**. O Figma permanece adiado para a etapa final de acabamento visual.
+O que ainda depende de validação externa ou acabamento:
+- teste de usabilidade com participantes;
+- revisão visual final/Figma;
+- capturas definitivas do case;
+- publicação web.
 
-## Documentação já estruturada
+## Origem do case
 
-- Fundação e escopo
-- Jornada CX e momentos da verdade
-- Requisitos e regras de negócio
-- Journey Health Score v1 e v2
-- Arquitetura de informação
-- Personas e cenários
-- Fluxos e casos de uso
-- Métricas CX/CS e Voz do Cliente
-- Diretrizes de privacidade/LGPD
-- Customer Journey Map textual
-- Wireframes textuais do MVP
-- Esquema lógico de dados
-- Plano de dados fictícios
-- Backlog e roadmap
-- Origem profissional e estudo de caso
-- Service Blueprint
-- Critérios de aceite do MVP
-- Plano de testes e usabilidade
-- Escopo seguro de IA
-- Roteiro do case de portfólio
-- Dicionário de dados
-- Registro de decisões de produto
+A experiência profissional que inspirou o problema é real. A solução foi desenvolvida como um projeto independente de estudo e portfólio para demonstrar a transformação de conhecimento de negócio em uma proposta de CX/CS apoiada por tecnologia.
 
-## MVP funcional local
+## Documentação de portfólio
 
-A validação do produto acontece primeiro em uma aplicação web local, sem dependências externas.
+Consulte:
+- `docs/18_ROTEIRO_CASE_PORTFOLIO.md`
+- `docs/23_ROTEIRO_TESTE_USABILIDADE.md`
+- `docs/24_CHECKLIST_PUBLICACAO_PORTFOLIO.md`
+- `docs/26_GUIA_DEMONSTRACAO_PORTFOLIO.md`
+- `docs/27_CAPTURAS_FINAIS_RECOMENDADAS.md`
 
-Além das telas de Dashboard CX/CS, Carteira, Cliente 360º, Central de Prioridades, Voz do Cliente e experiência mobile, o MVP agora permite:
+---
 
-- salvar alterações localmente no navegador;
-- registrar interações e observações;
-- alterar a etapa da jornada e a próxima ação;
-- acompanhar e atualizar itens documentais fictícios;
-- visualizar uma timeline com o histórico da jornada.
-- visualizar o progresso real da jornada por etapa e percentual;
-- distinguir avanços e retornos de etapa na timeline;
-- recalcular automaticamente o Journey Health Score e explicar seus fatores;
-- priorizar automaticamente jornadas com motivo e próxima ação;
-- calcular o Dashboard com os dados da própria carteira;
-- registrar CSAT/NPS e comentários fictícios na visão do cliente;
-- consolidar Voz do Cliente e atritos a partir dos registros locais;
-- registrar situação da jornada como em andamento, concluída ou interrompida, com motivo demonstrativo quando aplicável;
-- calcular taxas de conclusão e interrupção entre jornadas encerradas;
-- classificar comentários fictícios da Voz do Cliente por tema;
-- gerar sugestões demonstrativas de abordagem para acompanhamento, sem envio automático;
-- executar testes automatizados por `npm test`;
-
-O Journey Health Score já é recalculado automaticamente e exibe os fatores que compõem a pontuação. A Central de Prioridades, o Dashboard e a Voz do Cliente já usam os dados do próprio MVP. CSAT e NPS podem ser registrados na visão mobile e permanecem salvos localmente. A massa demonstrativa foi ampliada para 24 clientes fictícios, incluindo jornadas concluídas e interrompidas para validar os indicadores de desfecho. A suíte automatizada cobre Health Score, prioridades, analytics, desfechos e verificações de qualidade/acessibilidade.
-
-O Figma será retomado apenas no acabamento final, após os fluxos e regras estarem consolidados.
-
-## Testes automatizados
-
-Na raiz do projeto, execute `npm test`. O repositório também inclui um workflow do GitHub Actions para validar as regras principais a cada push ou pull request para `main`.
-
-## Qualidade e segurança do MVP
-
-A versão atual inclui verificações automatizadas para confirmar:
-- uso exclusivo de massa demonstrativa fictícia;
-- ausência de campos pessoais/sensíveis na massa padrão;
-- mensagens explícitas separando CX/CS de decisão financeira;
-- carregamento local dos scripts e estilos do MVP;
-- recursos básicos de acessibilidade, como `skip link`, foco visível, ARIA e redução de movimento;
-- comportamento de jornadas ativas, concluídas e interrompidas.
-
-A validação automatizada pode ser executada com `npm test`.
+**Projeto de portfólio desenvolvido por Priscilla Cahino.**

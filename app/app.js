@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'jornada360_mvp_v2';
-const STORAGE_VERSION = 7;
+const STORAGE_VERSION = 8;
 
 const stages = [
   'Necessidade',
@@ -574,7 +574,8 @@ function layout(content) {
             ['clients', 'Clientes'],
             ['priorities', 'Prioridades'],
             ['cx', 'Voz do Cliente'],
-            ['customer', 'Visão do cliente']
+            ['customer', 'Visão do cliente'],
+            ['case', 'Sobre o case']
           ].map(([v, l]) => `<button type="button" data-v="${v}" class="${view === v ? 'active' : ''}" ${view === v ? 'aria-current="page"' : ''}>${l}</button>`).join('')}
         </nav>
         <div class="side-footer">
@@ -1433,13 +1434,108 @@ function customer() {
   }
 }
 
+
+function caseView() {
+  const analytics = getPortfolioAnalytics();
+  const outcomes = JornadaAnalytics.outcomeMetrics(clients);
+
+  layout(`
+    <div class="top">
+      <div>
+        <h1>Sobre o case Jornada360</h1>
+        <p class="sub">Como experiência profissional, CX/CS e tecnologia foram transformados em um produto demonstrativo.</p>
+      </div>
+      <span class="pill">MVP funcional local • dados 100% fictícios</span>
+    </div>
+
+    <section class="case-hero card">
+      <span class="case-kicker">Pergunta de projeto</span>
+      <h2>Como tornar uma jornada operacional complexa mais clara, acompanhável e orientada ao próximo passo?</h2>
+      <p>O Jornada360 nasceu da observação de que uma operação pode estar tecnicamente em andamento enquanto o cliente ainda percebe silêncio, dúvida ou falta de previsibilidade. O projeto reorganiza esse acompanhamento sob a ótica de Customer Experience e Customer Success.</p>
+    </section>
+
+    <section class="case-grid">
+      <article class="card">
+        <h2>Problema observado</h2>
+        <p>Várias etapas, documentos, períodos de espera e interações dificultam a visão do cliente e a priorização do profissional.</p>
+      </article>
+
+      <article class="card">
+        <h2>Solução proposta</h2>
+        <p>Uma visão dupla: o profissional acompanha carteira, prioridades, histórico e indicadores; o cliente acompanha etapa, pendências e próximo passo.</p>
+      </article>
+
+      <article class="card">
+        <h2>Minha contribuição</h2>
+        <p>Modelagem da jornada, requisitos, regras de negócio, CX/CS, arquitetura de informação, métricas, desenvolvimento do MVP, testes e documentação.</p>
+      </article>
+
+      <article class="card">
+        <h2>Limites do projeto</h2>
+        <p>Não aprova crédito, não mede risco financeiro, não usa dados reais e não reproduz critérios proprietários de instituições financeiras.</p>
+      </article>
+    </section>
+
+    <section class="case-grid">
+      <article class="card">
+        <h2>O que já funciona</h2>
+        <ul class="case-list">
+          <li>Cliente 360º com jornada, checklist e timeline</li>
+          <li>Journey Health Score automático e explicável</li>
+          <li>Central de Prioridades baseada nos dados do MVP</li>
+          <li>Dashboard, CSAT, NPS e Voz do Cliente</li>
+          <li>Conclusão e interrupção da jornada</li>
+          <li>Testes automatizados e persistência local</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Escala demonstrativa atual</h2>
+        <div class="case-stats">
+          <div><strong>${analytics.portfolio.total}</strong><span>clientes fictícios</span></div>
+          <div><strong>${analytics.portfolio.active}</strong><span>jornadas ativas</span></div>
+          <div><strong>${outcomes.completed}</strong><span>concluídas</span></div>
+          <div><strong>${outcomes.interrupted}</strong><span>interrompidas</span></div>
+        </div>
+        <p class="small">Os números refletem somente a massa fictícia salva neste navegador.</p>
+      </article>
+    </section>
+
+    <section class="case-grid">
+      <article class="card">
+        <h2>Stack do MVP</h2>
+        <p>HTML, CSS e JavaScript puro, armazenamento local com <code>localStorage</code>, testes com Node.js e validação contínua pelo GitHub Actions.</p>
+      </article>
+
+      <article class="card">
+        <h2>Princípios de produto</h2>
+        <ul class="case-list">
+          <li>clareza do próximo passo;</li>
+          <li>priorização explicável;</li>
+          <li>minimização de dados;</li>
+          <li>apoio humano, sem decisão financeira automatizada;</li>
+          <li>feedback transformado em aprendizado de CX.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="card case-next">
+      <h2>Estado do projeto</h2>
+      <p><b>MVP funcional local concluído.</b> Permanecem como etapas externas: teste de usabilidade com participantes, acabamento visual final e publicação web.</p>
+      <p class="small">Esta tela foi criada para facilitar a apresentação do projeto em portfólio, entrevistas e avaliações acadêmicas/profissionais.</p>
+    </section>
+  `);
+}
+
+
 function render() {
   ({
     dashboard,
     clients: clientList,
     priorities,
     cx,
-    customer
+    customer,
+    case: caseView
   }[view] || dashboard)();
 }
 

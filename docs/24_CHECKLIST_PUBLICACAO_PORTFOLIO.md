@@ -1,6 +1,8 @@
 # Checklist de publicação — Jornada360
 
 ## Antes da publicação web
+- [x] Case final estruturado
+- [x] Guia de demonstração preparado
 - [x] Dados fictícios
 - [x] Avisos de independência institucional
 - [x] Health Score separado de risco de crédito
@@ -11,7 +13,7 @@
 - [ ] Teste de usabilidade humano
 - [ ] Capturas finais das telas
 - [ ] Acabamento visual final
-- [ ] Revisão final do README
+- [x] Revisão final do README
 - [ ] Definição da URL pública
 
 ## Não publicar

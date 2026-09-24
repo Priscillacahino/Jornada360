@@ -3,40 +3,48 @@
 ## Fase 1 — Fundação [concluída]
 Escopo, jornada, requisitos, arquitetura e Health Score inicial.
 
-## Fase 2 — Produto CX [concluída em especificação]
-Personas, cenários, fluxos, métricas, Health Score v2, privacidade, modelo de dados e wireframes textuais.
+## Fase 2 — Produto CX [concluída]
+Personas, cenários, fluxos, métricas, privacidade, modelo de dados e wireframes textuais.
 
-## Fase 3 — Protótipo visual [mantido para o final]
-- mini design system;
-- wireframes visuais;
-- telas desktop do profissional;
-- telas mobile do cliente;
-- protótipo navegável.
+## Fase 3 — MVP funcional [concluída]
+- aplicação web local;
+- massa fictícia;
+- filtros e Cliente 360º;
+- Central de Prioridades;
+- Health Score explicável;
+- CSAT/NPS;
+- Dashboard;
+- Voz do Cliente;
+- conclusão/interrupção;
+- visão mobile demonstrativa.
 
-## Fase 4 — MVP funcional [em andamento]
-- aplicação web [concluído];
-- dados fictícios [concluído para o MVP atual];
-- filtros e Cliente 360º [concluído];
-- Central de Prioridades dinâmica [concluído];
-- cálculo explicável do Health Score [concluído];
-- pesquisas e dashboard CX [concluídos no MVP local].
+## Fase 4 — Qualidade [concluída no que não depende de terceiros]
+- testes automatizados;
+- GitHub Actions;
+- acessibilidade estática;
+- responsividade;
+- privacidade e mensagens;
+- auditoria da massa fictícia.
 
-## Fase 5 — Qualidade [concluída no que não depende de terceiros]
-- testes funcionais automatizados [concluído];
-- acessibilidade estática e navegação por teclado [revisadas no MVP];
-- responsividade [revisada no código do MVP];
-- privacidade e mensagens de segurança [revisadas];
-- desfechos de conclusão/interrupção [implementados e testados];
-- teste de usabilidade com participantes [pendente de validação humana].
+## Fase 5 — Apoio operacional [concluída]
+- resumo da carteira;
+- classificação determinística de VoC;
+- sugestões demonstrativas de abordagem;
+- nenhuma mensagem enviada automaticamente;
+- nenhuma decisão financeira automatizada.
 
-## Fase 6 — Apoio operacional [concluída sem IA externa]
-- resumo da carteira [concluído];
-- classificação determinística de comentários de VoC [concluído];
-- sugestões demonstrativas de abordagem [concluído];
-- nenhuma mensagem é enviada automaticamente;
-- nenhuma decisão financeira é automatizada.
+## Fase 6 — Portfólio [preparada]
+- README final;
+- case consolidado;
+- tela Sobre o case;
+- guia de demonstração;
+- roteiro de capturas;
+- checklist de publicação.
 
-A versão atual usa regras simples e transparentes. Uma camada futura de IA é opcional e não é necessária para o funcionamento do MVP.
+## Dependências externas/finais
+- teste de usabilidade com participantes;
+- revisão visual final/Figma;
+- capturas definitivas;
+- publicação web.
 
-## Fase 7 — Portfólio [próxima]
-Case final, imagens de demonstração, acabamento visual, README final e publicação web quando autorizada/configurada.
+Uma camada futura de IA é opcional e não é necessária para o funcionamento do MVP.
