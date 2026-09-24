@@ -32,14 +32,13 @@
 - timeline automática da jornada;
 - progresso visual real da jornada com etapa/percentual e legenda;
 - diferenciação entre avanço e retorno de etapa na timeline;
-- Central de Prioridades demonstrativa;
+- Central de Prioridades dinâmica e explicável;
 - Voz do Cliente demonstrativa;
 - experiência mobile demonstrativa;
 - mensagens explícitas separando saúde da jornada de risco de crédito.
 - Journey Health Score automático, programático e explicável;
 
 ## Próxima evolução sem terceiros
-- Central de Prioridades baseada nos próprios dados;
 - formulário CSAT/NPS funcional;
 - dashboard alimentado pelos dados do MVP;
 - ampliar massa de dados fictícios;

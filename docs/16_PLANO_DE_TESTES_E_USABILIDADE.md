@@ -46,3 +46,22 @@ O participante deve completar as tarefas sem explicação externa e sem confundi
 - hierarquia de títulos;
 - não depender apenas de cor para status;
 - textos compreensíveis em zoom de 200%.
+
+## Central de Prioridades dinâmica
+
+Testes manuais:
+1. abrir **Prioridades**;
+2. confirmar que Acompanhamento aparece antes de Atenção e Saudável;
+3. conferir motivo principal e próxima ação;
+4. abrir os fatores explicativos;
+5. testar busca por nome;
+6. testar cada filtro;
+7. usar **Abrir Cliente 360º**;
+8. alterar interação/documento de um cliente e conferir se a prioridade muda após o recálculo.
+
+Teste automatizado:
+
+`node tests/priorities.test.js`
+
+O teste valida ordenação, motivo explicável, métricas e contagem de jornadas que precisam de ação.
+

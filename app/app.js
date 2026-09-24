@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'jornada360_mvp_v2';
-const STORAGE_VERSION = 4;
+const STORAGE_VERSION = 5;
 
 const stages = [
   'Necessidade',
@@ -317,6 +317,100 @@ function healthBreakdownMarkup(health) {
   return `${factorRows}${alerts}`;
 }
 
+function getPriorityList() {
+  recalculateAllHealth();
+  return JornadaPriorities.buildPriorityList(clients, stages);
+}
+
+function priorityLevelBadge(item) {
+  return `<span class="priority-level ${safeText(item.status)}">${safeText(item.levelLabel)}</span>`;
+}
+
+function priorityReasonsMarkup(item) {
+  if (!item.reasons.length) {
+    return '<p class="small">Nenhum fator de atenção identificado.</p>';
+  }
+
+  return `
+    <ul class="priority-reasons">
+      ${item.reasons.map(reason => `
+        <li>
+          <b>${safeText(reason.label)}</b>
+          <span>${safeText(reason.message)}</span>
+        </li>
+      `).join('')}
+    </ul>
+  `;
+}
+
+function priorityCardMarkup(item, compact = false) {
+  const interactionText = item.daysWithoutInteraction === null
+    ? 'Sem interação registrada'
+    : `${item.daysWithoutInteraction} dia(s) desde a última interação`;
+
+  if (compact) {
+    return `
+      <div class="priority-row">
+        <div>
+          <div class="priority-name-line">
+            <b>${safeText(item.name)}</b>
+            ${priorityLevelBadge(item)}
+          </div>
+          <div class="small">${safeText(item.stage)} • Health ${item.score}/100</div>
+        </div>
+        <div>
+          <b>${safeText(item.primaryFactor)}</b>
+          <div class="small">${safeText(item.primaryReason)}</div>
+        </div>
+        <div>
+          <div class="small">Próxima ação</div>
+          <b>${safeText(item.nextAction)}</b>
+        </div>
+        <button class="btn priority-open" data-priority-client="${item.clientId}">Abrir</button>
+      </div>
+    `;
+  }
+
+  return `
+    <article class="priority-card ${safeText(item.status)}">
+      <div class="priority-card-head">
+        <div>
+          <div class="priority-name-line">
+            <h3>${safeText(item.name)}</h3>
+            ${priorityLevelBadge(item)}
+          </div>
+          <p class="small">${safeText(item.stage)} • Health ${item.score}/100 • ${safeText(interactionText)}</p>
+        </div>
+        <button class="btn priority-open" data-priority-client="${item.clientId}">Abrir Cliente 360º</button>
+      </div>
+
+      <div class="priority-grid">
+        <div>
+          <span class="priority-label">Motivo principal</span>
+          <b>${safeText(item.primaryFactor)}</b>
+          <p>${safeText(item.primaryReason)}</p>
+        </div>
+        <div>
+          <span class="priority-label">Próxima ação</span>
+          <b>${safeText(item.nextAction)}</b>
+          <p>${item.activeDocuments} item(ns) documental(is) ativo(s)</p>
+        </div>
+      </div>
+
+      <details class="priority-details">
+        <summary>Ver fatores que explicam a prioridade</summary>
+        ${priorityReasonsMarkup(item)}
+      </details>
+    </article>
+  `;
+}
+
+function bindPriorityButtons() {
+  document.querySelectorAll('[data-priority-client]').forEach(button => {
+    button.onclick = () => detail(button.dataset.priorityClient);
+  });
+}
+
 function refreshPendingSummary(c) {
   const active = c.documents.filter(d => d.status !== 'resolved');
   if (!active.length) {
@@ -394,13 +488,17 @@ function dashboard() {
 
     <section class="cols">
       <div class="card">
-        <h2>Prioridades de hoje</h2>
-        ${clients.filter(c => c.status !== 'healthy').slice(0, 4).map(c => `
-          <div class="row">
-            <div><b>${safeText(c.name)}</b><div class="small">${safeText(c.stage)}</div></div>
-            <div>${safeText(c.pending)}<div class="small">Próxima ação: ${safeText(c.next)}</div></div>
-            <div>${badge(c)}</div>
-          </div>`).join('')}
+        <div class="section-head">
+          <div>
+            <h2>Prioridades de hoje</h2>
+            <p class="small">Ordenadas automaticamente pela saúde da jornada e pelos fatores de atenção.</p>
+          </div>
+        </div>
+        ${getPriorityList()
+          .filter(item => item.status !== 'healthy')
+          .slice(0, 4)
+          .map(item => priorityCardMarkup(item, true))
+          .join('') || '<div class="empty">Nenhuma jornada exige acompanhamento agora.</div>'}
       </div>
       <div class="card">
         <h2>Insight CX</h2>
@@ -409,6 +507,7 @@ function dashboard() {
       </div>
     </section>
   `);
+  bindPriorityButtons();
 }
 
 function clientList() {
@@ -834,33 +933,67 @@ function detail(id) {
 }
 
 function priorities() {
-  recalculateAllHealth();
+  const priorityList = getPriorityList();
+  const metrics = JornadaPriorities.priorityMetrics(priorityList);
+
   layout(`
     <div class="top">
       <div>
         <h1>Central de Prioridades</h1>
-        <p class="sub">Motivo da sinalização + próxima ação, sem associação a risco de crédito.</p>
+        <p class="sub">Prioridades calculadas com base na saúde da jornada, com motivo e próxima ação explicáveis.</p>
       </div>
+      <span class="pill">${metrics.needsAction} jornada(s) pedem acompanhamento</span>
     </div>
+
     <div class="grid4">
-      ${[
-        ['5', 'Acompanhamento'],
-        ['11', 'Em atenção'],
-        ['7', 'Pendências documentais'],
-        ['4', 'Sem interação']
-      ].map(x => `<div class="card metric"><strong>${x[0]}</strong><span>${x[1]}</span></div>`).join('')}
+      <div class="card metric"><strong>${metrics.high}</strong><span>Acompanhamento</span></div>
+      <div class="card metric"><strong>${metrics.attention}</strong><span>Em atenção</span></div>
+      <div class="card metric"><strong>${metrics.activeDocuments}</strong><span>Itens documentais ativos</span></div>
+      <div class="card metric"><strong>${metrics.withoutInteraction}</strong><span>8+ dias sem interação</span></div>
     </div>
-    <div class="card" style="margin-top:18px">
-      <h2>Quem precisa de acompanhamento hoje</h2>
-      ${clients.filter(c => c.status !== 'healthy').map(c => `
-        <div class="row">
-          <div><b>${safeText(c.name)}</b><div class="small">${safeText(c.stage)}</div></div>
-          <div>${safeText(c.pending)}<div class="small">Próxima ação: ${safeText(c.next)}</div></div>
-          <div>${badge(c)}</div>
-        </div>`).join('')}
+
+    <div class="toolbar priority-toolbar">
+      <input id="priority-q" placeholder="Buscar cliente" aria-label="Buscar cliente na Central de Prioridades">
+      <select id="priority-filter" aria-label="Filtrar prioridades">
+        <option value="needs-action">Acompanhamento + Atenção</option>
+        <option value="high">Somente acompanhamento</option>
+        <option value="attention">Somente atenção</option>
+        <option value="healthy">Somente saudáveis</option>
+        <option value="all">Todos</option>
+      </select>
     </div>
-    <p class="notice">Prioridade indica necessidade de acompanhamento da experiência. Não representa risco de crédito, elegibilidade ou probabilidade de aprovação.</p>
+
+    <div id="priority-list" class="priority-list"></div>
+
+    <p class="notice">
+      A prioridade indica necessidade de acompanhamento de CX/CS. Ela não representa risco de crédito,
+      elegibilidade, capacidade financeira ou probabilidade de aprovação.
+    </p>
   `);
+
+  const draw = () => {
+    const q = document.querySelector('#priority-q').value.trim().toLowerCase();
+    const filter = document.querySelector('#priority-filter').value;
+
+    const filtered = getPriorityList().filter(item => {
+      const matchesName = item.name.toLowerCase().includes(q);
+      const matchesFilter =
+        filter === 'all' ||
+        (filter === 'needs-action' && item.status !== 'healthy') ||
+        item.status === filter;
+      return matchesName && matchesFilter;
+    });
+
+    document.querySelector('#priority-list').innerHTML = filtered.length
+      ? filtered.map(item => priorityCardMarkup(item)).join('')
+      : '<div class="card empty">Nenhum cliente encontrado para este filtro.</div>';
+
+    bindPriorityButtons();
+  };
+
+  document.querySelector('#priority-q').oninput = draw;
+  document.querySelector('#priority-filter').onchange = draw;
+  draw();
 }
 
 function cx() {

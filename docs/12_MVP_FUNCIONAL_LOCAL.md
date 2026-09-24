@@ -132,3 +132,21 @@ O Cliente 360º mostra a decomposição da pontuação e os fatores que exigem a
 A ausência de pesquisa de satisfação recebe valor neutro e não gera alerta isoladamente.
 
 O indicador continua estritamente separado de análise de crédito, elegibilidade e decisão financeira.
+
+## Central de Prioridades dinâmica
+
+A Central de Prioridades agora é alimentada pelos próprios dados do MVP.
+
+Ela:
+- ordena automaticamente jornadas em Acompanhamento, Atenção e Saudável;
+- usa o Journey Health Score e seus fatores explicáveis;
+- exibe o motivo principal da prioridade;
+- mostra a próxima ação;
+- permite visualizar até três fatores que justificam a sinalização;
+- possui busca e filtros;
+- calcula contadores reais da massa fictícia atual;
+- abre diretamente o Cliente 360º.
+
+O bloco **Prioridades de hoje** do dashboard utiliza a mesma regra de ordenação.
+
+A prioridade continua restrita ao acompanhamento de CX/CS e não representa risco ou decisão financeira.

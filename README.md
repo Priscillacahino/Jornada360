@@ -116,7 +116,8 @@ Além das telas de Dashboard CX/CS, Carteira, Cliente 360º, Central de Priorida
 - visualizar o progresso real da jornada por etapa e percentual;
 - distinguir avanços e retornos de etapa na timeline;
 - recalcular automaticamente o Journey Health Score e explicar seus fatores;
+- priorizar automaticamente jornadas com motivo e próxima ação;
 
-O Journey Health Score já é recalculado automaticamente e exibe os fatores que compõem a pontuação. As métricas consolidadas do dashboard, CSAT/NPS e a priorização automática ainda serão evoluídas nas próximas etapas.
+O Journey Health Score já é recalculado automaticamente e exibe os fatores que compõem a pontuação. A Central de Prioridades já usa os dados do MVP e os fatores do Journey Health Score para ordenar o acompanhamento. As métricas consolidadas do dashboard e CSAT/NPS ainda serão evoluídos nas próximas etapas.
 
 O Figma será retomado apenas no acabamento final, após os fluxos e regras estarem consolidados.
