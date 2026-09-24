@@ -73,8 +73,9 @@ Necessidade → Primeiro atendimento → Diagnóstico inicial → Documentação
 
 ## Status
 
-🟡 Em desenvolvimento — fundação e especificação concluídas; MVP funcional local iniciado. O Figma foi adiado para a etapa final de acabamento visual.
+🟡 Em desenvolvimento — fundação e especificação concluídas; MVP funcional local em evolução.
 
+A versão atual já possui **persistência local demonstrativa**, **Cliente 360º interativo**, **checklist documental funcional** e **timeline da jornada**. O Figma permanece adiado para a etapa final de acabamento visual.
 
 ## Documentação já estruturada
 
@@ -101,7 +102,18 @@ Necessidade → Primeiro atendimento → Diagnóstico inicial → Documentação
 - Dicionário de dados
 - Registro de decisões de produto
 
-
 ## MVP funcional local
 
-A validação do produto agora acontece primeiro em uma aplicação web local, sem dependências externas. O protótipo inclui Dashboard CX/CS, Carteira, Cliente 360º, Central de Prioridades, Voz do Cliente e experiência mobile. O Figma será retomado apenas no acabamento final, após os fluxos e regras estarem consolidados.
+A validação do produto acontece primeiro em uma aplicação web local, sem dependências externas.
+
+Além das telas de Dashboard CX/CS, Carteira, Cliente 360º, Central de Prioridades, Voz do Cliente e experiência mobile, o MVP agora permite:
+
+- salvar alterações localmente no navegador;
+- registrar interações e observações;
+- alterar a etapa da jornada e a próxima ação;
+- acompanhar e atualizar itens documentais fictícios;
+- visualizar uma timeline com o histórico da jornada.
+
+O Health Score, as métricas consolidadas do dashboard, CSAT/NPS e a priorização automática continuam demonstrativos e serão evoluídos nas próximas etapas.
+
+O Figma será retomado apenas no acabamento final, após os fluxos e regras estarem consolidados.

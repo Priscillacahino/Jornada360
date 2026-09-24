@@ -18,16 +18,29 @@
 - limites de IA;
 - roteiro do case de portfólio;
 - wireframes textuais;
-- MVP web local inicial;
 - publicação da estrutura atual no GitHub.
 
-## Pode avançar sem terceiros
-- ampliar massa de dados fictícios;
-- persistência local demonstrativa;
+## Concluído no MVP funcional local
+- dashboard profissional CX/CS;
+- carteira de clientes fictícios com busca e filtro;
+- Cliente 360º;
+- persistência local demonstrativa com `localStorage`;
+- registro de interações;
+- registro de observações;
+- atualização da etapa e da próxima ação;
 - checklist documental funcional;
-- timeline e tarefas;
+- timeline automática da jornada;
+- Central de Prioridades demonstrativa;
+- Voz do Cliente demonstrativa;
+- experiência mobile demonstrativa;
+- mensagens explícitas separando saúde da jornada de risco de crédito.
+
+## Próxima evolução sem terceiros
+- cálculo programático e explicável do Journey Health Score;
+- Central de Prioridades baseada nos próprios dados;
 - formulário CSAT/NPS funcional;
-- cálculo programático do Health Score;
+- dashboard alimentado pelos dados do MVP;
+- ampliar massa de dados fictícios;
 - acessibilidade e responsividade;
 - testes automatizados das regras puras;
 - documentação final e pacote de apresentação.

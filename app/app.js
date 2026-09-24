@@ -1,19 +1,802 @@
-const clients=[
-{name:'Mariana Costa',stage:'Documentação',score:68,status:'attention',last:3,pending:'Comprovante complementar',next:'Confirmar recebimento do documento'},
-{name:'Carlos Mendes',stage:'Documentação',score:42,status:'high',last:11,pending:'Documento pendente há 11 dias',next:'Confirmar dificuldade no envio'},
-{name:'Fernanda Lima',stage:'Análise',score:47,status:'high',last:15,pending:'Sem interação há 15 dias',next:'Realizar contato de acompanhamento'},
-{name:'Pedro Alves',stage:'Diagnóstico',score:73,status:'attention',last:2,pending:'Nova solicitação documental',next:'Orientar sobre documento solicitado'},
-{name:'Ana Ribeiro',stage:'Análise',score:76,status:'attention',last:8,pending:'Etapa sem atualização há 8 dias',next:'Verificar andamento e atualizar status'},
-{name:'Luiza Rocha',stage:'Preparação',score:91,status:'healthy',last:1,pending:'Nenhuma',next:'Orientar etapa final'},
-{name:'Rafael Souza',stage:'Pós-atendimento',score:95,status:'healthy',last:0,pending:'Nenhuma',next:'Coletar NPS'}];
-const stages=['Necessidade','Atendimento','Diagnóstico','Documentação','Análise','Pendências','Preparação','Contratação','Pós'];
-let view='dashboard'; const app=document.querySelector('#app');
-function badge(c){return `<span class="badge ${c.status}">${c.status==='healthy'?'Saudável':c.status==='attention'?'Atenção':'Acompanhamento'}</span>`}
-function layout(content){app.innerHTML=`<div class="shell"><aside class="side"><div class="brand">Jornada360</div><div class="tag">CX • Customer Success</div><nav class="nav">${[['dashboard','Visão geral'],['clients','Clientes'],['priorities','Prioridades'],['cx','Voz do Cliente'],['customer','Visão do cliente']].map(([v,l])=>`<button data-v="${v}" class="${view===v?'active':''}">${l}</button>`).join('')}</nav></aside><main class="main">${content}</main></div>`;document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{view=b.dataset.v;render()})}
-function dashboard(){layout(`<div class="top"><div><h1>Visão geral da carteira</h1><p class="sub">Quem precisa de atenção e quais atritos estão afetando a jornada?</p></div><span class="pill">Ambiente demonstrativo • dados fictícios</span></div><section class="grid4">${[['38','Clientes ativos'],['22','Jornadas saudáveis'],['11','Em atenção'],['5','Necessitam acompanhamento']].map(x=>`<div class="card metric"><strong>${x[0]}</strong><span>${x[1]}</span></div>`).join('')}</section><section class="cols"><div class="card"><h2>Prioridades de hoje</h2>${clients.filter(c=>c.status!=='healthy').slice(0,4).map(c=>`<div class="row"><div><b>${c.name}</b><div class="small">${c.stage}</div></div><div>${c.pending}<div class="small">Próxima ação: ${c.next}</div></div><div>${badge(c)}</div></div>`).join('')}</div><div class="card"><h2>Insight CX</h2><p>Documentação é o principal ponto de atrito desta carteira demonstrativa.</p><p class="small">Ação sugerida: revisar orientações e acompanhar pendências antigas. A sugestão apoia o profissional; não toma decisões financeiras.</p></div></section>`)}
-function clientList(){layout(`<div class="top"><div><h1>Carteira de clientes</h1><p class="sub">Acompanhamento organizado por jornada e necessidade de ação.</p></div></div><div class="toolbar"><input id="q" placeholder="Buscar cliente"><select id="filter"><option value="all">Todos</option><option value="high">Acompanhamento</option><option value="attention">Atenção</option><option value="healthy">Saudável</option></select></div><div class="card" id="list"></div>`);const draw=()=>{let q=document.querySelector('#q').value.toLowerCase(),f=document.querySelector('#filter').value;document.querySelector('#list').innerHTML=clients.filter(c=>c.name.toLowerCase().includes(q)&&(f==='all'||c.status===f)).map((c,i)=>`<div class="row"><div><b>${c.name}</b><div class="small">${c.stage}</div></div><div>Health ${c.score}/100<div class="small">${c.pending}</div></div><div>${badge(c)} <button class="btn" data-client="${clients.indexOf(c)}">Abrir</button></div></div>`).join('');document.querySelectorAll('[data-client]').forEach(b=>b.onclick=()=>detail(+b.dataset.client))};document.querySelector('#q').oninput=draw;document.querySelector('#filter').onchange=draw;draw()}
-function detail(i){const c=clients[i];view='clients';layout(`<div class="top"><div><h1>Cliente 360º — ${c.name}</h1><p class="sub">Visão da experiência e do acompanhamento. Não é análise de crédito.</p></div>${badge(c)}</div><div class="grid4"><div class="card metric"><strong>${c.score}/100</strong><span>Saúde da jornada</span></div><div class="card metric"><strong>${c.stage}</strong><span>Etapa atual</span></div><div class="card metric"><strong>${c.last} dias</strong><span>Desde a última interação</span></div><div class="card metric"><strong>${c.pending==='Nenhuma'?'0':'1'}</strong><span>Pendências ativas</span></div></div><div class="card" style="margin-top:18px"><h2>Jornada</h2><div class="journey">${stages.map((s,n)=>`<div class="stage ${n<3?'done':s.startsWith(c.stage.slice(0,5))?'current':''}">${s}</div>`).join('')}</div></div><section class="cols"><div class="card"><h2>Pendência / acompanhamento</h2><p>${c.pending}</p><p><b>Próxima ação:</b> ${c.next}</p><button class="btn alt" onclick="alert('Interação fictícia registrada para demonstração.')">Registrar interação</button></div><div class="card"><h2>Por que este score?</h2><div class="score">${c.score}</div><div class="reason">Evolução da jornada</div><div class="reason">Situação documental</div><div class="reason">Pendências e tempo sem atualização</div><p class="small">Renda, idade, gênero, endereço e outros atributos pessoais não entram no cálculo.</p></div></section>`)}
-function priorities(){layout(`<div class="top"><div><h1>Central de Prioridades</h1><p class="sub">Motivo da sinalização + próxima ação, sem associação a risco de crédito.</p></div></div><div class="grid4">${[['5','Acompanhamento'],['11','Em atenção'],['7','Pendências documentais'],['4','Sem interação']].map(x=>`<div class="card metric"><strong>${x[0]}</strong><span>${x[1]}</span></div>`).join('')}</div><div class="card" style="margin-top:18px"><h2>Quem precisa de acompanhamento hoje</h2>${clients.filter(c=>c.status!=='healthy').map(c=>`<div class="row"><div><b>${c.name}</b><div class="small">${c.stage}</div></div><div>${c.pending}<div class="small">Próxima ação: ${c.next}</div></div><div>${badge(c)}</div></div>`).join('')}</div><p class="notice">Prioridade indica necessidade de acompanhamento da experiência. Não representa risco de crédito, elegibilidade ou probabilidade de aprovação.</p>`)}
-function cx(){layout(`<div class="top"><div><h1>Voz do Cliente</h1><p class="sub">Feedback transformado em aprendizado sobre a jornada.</p></div></div><div class="grid4"><div class="card metric"><strong>4,3/5</strong><span>CSAT demonstrativo</span></div><div class="card metric"><strong>+42</strong><span>NPS demonstrativo</span></div><div class="card metric"><strong>76%</strong><span>Conclusão</span></div><div class="card metric"><strong>24%</strong><span>Interrupção</span></div></div><section class="cols"><div class="card"><h2>Atritos mais citados</h2><div class="reason">Documentação — 41%</div><div class="reason">Tempo de espera — 28%</div><div class="reason">Comunicação/status — 19%</div><div class="reason">Outros — 12%</div></div><div class="card"><h2>Comentários fictícios</h2><p>“Gostei de saber exatamente o que faltava.”</p><p>“Queria receber atualização mesmo quando ainda estivesse aguardando.”</p><p class="small">A IA futura poderá classificar temas e resumir feedback, mas não decidirá questões financeiras.</p></div></section>`)}
-function customer(){layout(`<div class="top"><div><h1>Experiência mobile do cliente</h1><p class="sub">A tela deve responder: onde estou, preciso fazer algo e qual é o próximo passo?</p></div></div><div class="mobile-wrap"><div class="phone"><div class="small">Jornada360</div><h2>Olá, Mariana</h2><p class="small">Sua jornada está em andamento.</p><div class="progress"><i></i></div><p><b>Etapa atual:</b> Documentação</p><div class="action-box"><b>Você precisa fazer algo agora?</b><h3>Sim</h3><p>Envie o comprovante complementar solicitado.</p><button class="btn">Ver orientação</button></div><div class="card"><b>Próximo passo</b><p>Após a conferência, sua jornada poderá seguir para a etapa de análise.</p><span class="small">Última atualização: há 3 dias</span></div><h3>Como foi sua experiência até aqui?</h3><div class="survey">${[1,2,3,4,5].map(n=>`<button onclick="this.style.background='#efe8f0'">${n}</button>`).join('')}</div><p class="notice">Demonstração de portfólio. O acompanhamento exibido não representa aprovação ou decisão de instituição financeira.</p></div></div>`)}
-function render(){({dashboard,clients:clientList,priorities,cx,customer}[view]||dashboard)()}render();
+const STORAGE_KEY = 'jornada360_mvp_v2';
+const STORAGE_VERSION = 2;
+
+const stages = [
+  'Necessidade',
+  'Primeiro atendimento',
+  'Diagnóstico',
+  'Documentação',
+  'Análise',
+  'Retorno da instituição',
+  'Preparação para contrato',
+  'Contratação',
+  'Pós-atendimento'
+];
+
+function uid(prefix = 'id') {
+  return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function daysAgoISO(days) {
+  const d = new Date();
+  d.setDate(d.getDate() - days);
+  return d.toISOString();
+}
+
+function safeText(value = '') {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function formatDate(iso) {
+  if (!iso) return '—';
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(new Date(iso));
+}
+
+function documentStatusLabel(status) {
+  return ({
+    pending: 'Pendente',
+    received: 'Recebido',
+    review: 'Em conferência',
+    resolved: 'Concluído'
+  })[status] || status;
+}
+
+function createSeedClient(data, index) {
+  const id = `cliente-${index + 1}`;
+  const stageIndex = Math.max(0, stages.indexOf(data.stage));
+  const interactions = [{
+    id: uid('int'),
+    channel: 'Acompanhamento',
+    summary: `Último acompanhamento demonstrativo de ${data.name}.`,
+    occurredAt: daysAgoISO(data.last)
+  }];
+
+  const documents = data.pending === 'Nenhuma'
+    ? [
+        {
+          id: uid('doc'),
+          label: 'Documentação principal',
+          status: 'resolved',
+          requestedAt: daysAgoISO(Math.max(data.last + 5, 6)),
+          updatedAt: daysAgoISO(Math.max(data.last, 1)),
+          guidance: 'Documentação demonstrativa concluída.'
+        }
+      ]
+    : [
+        {
+          id: uid('doc'),
+          label: data.pending.includes('Documento') ? 'Documento solicitado' : 'Comprovante complementar',
+          status: data.stage === 'Documentação' ? 'pending' : 'review',
+          requestedAt: daysAgoISO(Math.max(data.last + 2, 4)),
+          updatedAt: daysAgoISO(Math.max(data.last, 1)),
+          guidance: data.next
+        }
+      ];
+
+  const timeline = [];
+  for (let i = 0; i <= stageIndex; i += 1) {
+    timeline.push({
+      id: uid('evt'),
+      type: 'stage',
+      title: i === stageIndex ? `Etapa atual: ${stages[i]}` : `Etapa concluída: ${stages[i]}`,
+      detail: i === stageIndex ? 'Etapa atual da jornada demonstrativa.' : 'Avanço registrado na jornada demonstrativa.',
+      occurredAt: daysAgoISO(Math.max((stageIndex - i) * 5 + data.last, data.last))
+    });
+  }
+  timeline.push({
+    id: uid('evt'),
+    type: 'interaction',
+    title: 'Interação registrada',
+    detail: interactions[0].summary,
+    occurredAt: interactions[0].occurredAt
+  });
+
+  return {
+    id,
+    name: data.name,
+    stage: data.stage,
+    score: data.score,
+    status: data.status,
+    pending: data.pending,
+    next: data.next,
+    interactions,
+    documents,
+    notes: [],
+    timeline
+  };
+}
+
+const seedClients = [
+  {name:'Mariana Costa',stage:'Documentação',score:68,status:'attention',last:3,pending:'Comprovante complementar',next:'Confirmar recebimento do documento'},
+  {name:'Carlos Mendes',stage:'Documentação',score:42,status:'high',last:11,pending:'Documento pendente há 11 dias',next:'Confirmar dificuldade no envio'},
+  {name:'Fernanda Lima',stage:'Análise',score:47,status:'high',last:15,pending:'Sem interação há 15 dias',next:'Realizar contato de acompanhamento'},
+  {name:'Pedro Alves',stage:'Diagnóstico',score:73,status:'attention',last:2,pending:'Nova solicitação documental',next:'Orientar sobre documento solicitado'},
+  {name:'Ana Ribeiro',stage:'Análise',score:76,status:'attention',last:8,pending:'Etapa sem atualização há 8 dias',next:'Verificar andamento e atualizar status'},
+  {name:'Luiza Rocha',stage:'Preparação para contrato',score:91,status:'healthy',last:1,pending:'Nenhuma',next:'Orientar etapa final'},
+  {name:'Rafael Souza',stage:'Pós-atendimento',score:95,status:'healthy',last:0,pending:'Nenhuma',next:'Coletar NPS'}
+].map(createSeedClient);
+
+function normalizeClient(client, index = 0) {
+  return {
+    id: client.id || `cliente-${index + 1}`,
+    name: client.name || 'Cliente fictício',
+    stage: stages.includes(client.stage) ? client.stage : 'Necessidade',
+    score: Number.isFinite(client.score) ? client.score : 70,
+    status: ['healthy', 'attention', 'high'].includes(client.status) ? client.status : 'attention',
+    pending: client.pending || 'Nenhuma',
+    next: client.next || 'Definir próxima ação',
+    interactions: Array.isArray(client.interactions) ? client.interactions : [],
+    documents: Array.isArray(client.documents) ? client.documents : [],
+    notes: Array.isArray(client.notes) ? client.notes : [],
+    timeline: Array.isArray(client.timeline) ? client.timeline : []
+  };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      return { version: STORAGE_VERSION, clients: seedClients };
+    }
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.clients)) throw new Error('Estrutura inválida');
+    return {
+      version: STORAGE_VERSION,
+      clients: parsed.clients.map(normalizeClient)
+    };
+  } catch (error) {
+    console.warn('Não foi possível carregar a persistência local. A massa fictícia foi restaurada.', error);
+    return { version: STORAGE_VERSION, clients: seedClients };
+  }
+}
+
+let state = loadState();
+let clients = state.clients;
+let view = 'dashboard';
+let currentClientId = null;
+const app = document.querySelector('#app');
+
+function saveState() {
+  state = { version: STORAGE_VERSION, clients };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  const indicator = document.querySelector('#save-indicator');
+  if (indicator) {
+    indicator.textContent = 'Salvo neste navegador';
+    indicator.classList.add('saved');
+    window.setTimeout(() => indicator.classList.remove('saved'), 900);
+  }
+}
+
+function resetDemoData() {
+  const ok = window.confirm('Restaurar os dados fictícios iniciais do Jornada360 neste navegador?');
+  if (!ok) return;
+  localStorage.removeItem(STORAGE_KEY);
+  clients = [
+    {name:'Mariana Costa',stage:'Documentação',score:68,status:'attention',last:3,pending:'Comprovante complementar',next:'Confirmar recebimento do documento'},
+    {name:'Carlos Mendes',stage:'Documentação',score:42,status:'high',last:11,pending:'Documento pendente há 11 dias',next:'Confirmar dificuldade no envio'},
+    {name:'Fernanda Lima',stage:'Análise',score:47,status:'high',last:15,pending:'Sem interação há 15 dias',next:'Realizar contato de acompanhamento'},
+    {name:'Pedro Alves',stage:'Diagnóstico',score:73,status:'attention',last:2,pending:'Nova solicitação documental',next:'Orientar sobre documento solicitado'},
+    {name:'Ana Ribeiro',stage:'Análise',score:76,status:'attention',last:8,pending:'Etapa sem atualização há 8 dias',next:'Verificar andamento e atualizar status'},
+    {name:'Luiza Rocha',stage:'Preparação para contrato',score:91,status:'healthy',last:1,pending:'Nenhuma',next:'Orientar etapa final'},
+    {name:'Rafael Souza',stage:'Pós-atendimento',score:95,status:'healthy',last:0,pending:'Nenhuma',next:'Coletar NPS'}
+  ].map(createSeedClient);
+  saveState();
+  view = 'dashboard';
+  currentClientId = null;
+  render();
+}
+
+function badge(c) {
+  return `<span class="badge ${c.status}">${
+    c.status === 'healthy' ? 'Saudável' : c.status === 'attention' ? 'Atenção' : 'Acompanhamento'
+  }</span>`;
+}
+
+function getClient(id) {
+  return clients.find(c => c.id === id);
+}
+
+function getDaysSinceLastInteraction(c) {
+  if (!c.interactions.length) return null;
+  const latest = [...c.interactions]
+    .sort((a, b) => new Date(b.occurredAt) - new Date(a.occurredAt))[0];
+  const diff = Date.now() - new Date(latest.occurredAt).getTime();
+  return Math.max(0, Math.floor(diff / 86400000));
+}
+
+function activeDocumentCount(c) {
+  return c.documents.filter(d => !['resolved'].includes(d.status)).length;
+}
+
+function refreshPendingSummary(c) {
+  const active = c.documents.filter(d => d.status !== 'resolved');
+  if (!active.length) {
+    c.pending = 'Nenhuma';
+    return;
+  }
+  const first = active[0];
+  c.pending = `${first.label} — ${documentStatusLabel(first.status)}`;
+}
+
+function addTimeline(c, type, title, detail) {
+  c.timeline.push({
+    id: uid('evt'),
+    type,
+    title,
+    detail,
+    occurredAt: new Date().toISOString()
+  });
+}
+
+function layout(content) {
+  app.innerHTML = `
+    <div class="shell">
+      <aside class="side">
+        <div class="brand">Jornada360</div>
+        <div class="tag">CX • Customer Success</div>
+        <nav class="nav">
+          ${[
+            ['dashboard', 'Visão geral'],
+            ['clients', 'Clientes'],
+            ['priorities', 'Prioridades'],
+            ['cx', 'Voz do Cliente'],
+            ['customer', 'Visão do cliente']
+          ].map(([v, l]) => `<button data-v="${v}" class="${view === v ? 'active' : ''}">${l}</button>`).join('')}
+        </nav>
+        <div class="side-footer">
+          <span id="save-indicator">Dados fictícios salvos localmente</span>
+          <button class="reset-btn" id="reset-demo">Restaurar demonstração</button>
+        </div>
+      </aside>
+      <main class="main">${content}</main>
+    </div>`;
+
+  document.querySelectorAll('[data-v]').forEach(button => {
+    button.onclick = () => {
+      view = button.dataset.v;
+      currentClientId = null;
+      render();
+    };
+  });
+
+  const reset = document.querySelector('#reset-demo');
+  if (reset) reset.onclick = resetDemoData;
+}
+
+function dashboard() {
+  layout(`
+    <div class="top">
+      <div>
+        <h1>Visão geral da carteira</h1>
+        <p class="sub">Quem precisa de atenção e quais atritos estão afetando a jornada?</p>
+      </div>
+      <span class="pill">Ambiente demonstrativo • dados fictícios</span>
+    </div>
+
+    <section class="grid4">
+      ${[
+        ['38', 'Clientes ativos'],
+        ['22', 'Jornadas saudáveis'],
+        ['11', 'Em atenção'],
+        ['5', 'Necessitam acompanhamento']
+      ].map(x => `<div class="card metric"><strong>${x[0]}</strong><span>${x[1]}</span></div>`).join('')}
+    </section>
+
+    <section class="cols">
+      <div class="card">
+        <h2>Prioridades de hoje</h2>
+        ${clients.filter(c => c.status !== 'healthy').slice(0, 4).map(c => `
+          <div class="row">
+            <div><b>${safeText(c.name)}</b><div class="small">${safeText(c.stage)}</div></div>
+            <div>${safeText(c.pending)}<div class="small">Próxima ação: ${safeText(c.next)}</div></div>
+            <div>${badge(c)}</div>
+          </div>`).join('')}
+      </div>
+      <div class="card">
+        <h2>Insight CX</h2>
+        <p>Documentação é o principal ponto de atrito desta carteira demonstrativa.</p>
+        <p class="small">Ação sugerida: revisar orientações e acompanhar pendências antigas. A sugestão apoia o profissional; não toma decisões financeiras.</p>
+      </div>
+    </section>
+  `);
+}
+
+function clientList() {
+  layout(`
+    <div class="top">
+      <div>
+        <h1>Carteira de clientes</h1>
+        <p class="sub">Acompanhamento organizado por jornada e necessidade de ação.</p>
+      </div>
+      <span class="pill">Alterações ficam salvas neste navegador</span>
+    </div>
+
+    <div class="toolbar">
+      <input id="q" placeholder="Buscar cliente" aria-label="Buscar cliente">
+      <select id="filter" aria-label="Filtrar situação">
+        <option value="all">Todos</option>
+        <option value="high">Acompanhamento</option>
+        <option value="attention">Atenção</option>
+        <option value="healthy">Saudável</option>
+      </select>
+    </div>
+    <div class="card" id="list"></div>
+  `);
+
+  const draw = () => {
+    const q = document.querySelector('#q').value.toLowerCase();
+    const f = document.querySelector('#filter').value;
+    const filtered = clients.filter(c =>
+      c.name.toLowerCase().includes(q) && (f === 'all' || c.status === f)
+    );
+
+    document.querySelector('#list').innerHTML = filtered.length
+      ? filtered.map(c => {
+          const days = getDaysSinceLastInteraction(c);
+          return `
+            <div class="row">
+              <div><b>${safeText(c.name)}</b><div class="small">${safeText(c.stage)}</div></div>
+              <div>
+                Health ${c.score}/100
+                <div class="small">${safeText(c.pending)} • ${days === null ? 'sem interação' : `${days} dia(s) desde a última interação`}</div>
+              </div>
+              <div>${badge(c)} <button class="btn" data-client="${c.id}">Abrir</button></div>
+            </div>`;
+        }).join('')
+      : '<div class="empty">Nenhum cliente encontrado.</div>';
+
+    document.querySelectorAll('[data-client]').forEach(button => {
+      button.onclick = () => detail(button.dataset.client);
+    });
+  };
+
+  document.querySelector('#q').oninput = draw;
+  document.querySelector('#filter').onchange = draw;
+  draw();
+}
+
+function journeyMarkup(c) {
+  const currentIndex = Math.max(0, stages.indexOf(c.stage));
+  return stages.map((s, n) => `
+    <div class="stage ${n < currentIndex ? 'done' : n === currentIndex ? 'current' : ''}">
+      <span>${n + 1}</span>${safeText(s)}
+    </div>`).join('');
+}
+
+function timelineMarkup(c) {
+  const sorted = [...c.timeline].sort((a, b) => new Date(b.occurredAt) - new Date(a.occurredAt));
+  if (!sorted.length) return '<div class="empty">Nenhum evento registrado.</div>';
+
+  return sorted.map(event => `
+    <div class="timeline-item">
+      <div class="timeline-dot ${safeText(event.type)}"></div>
+      <div>
+        <b>${safeText(event.title)}</b>
+        <p>${safeText(event.detail || '')}</p>
+        <span class="small">${formatDate(event.occurredAt)}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function documentMarkup(c) {
+  if (!c.documents.length) return '<div class="empty">Nenhum item documental cadastrado.</div>';
+
+  return c.documents.map(doc => `
+    <div class="document-item">
+      <div class="document-head">
+        <div>
+          <b>${safeText(doc.label)}</b>
+          <div class="small">Solicitado em ${formatDate(doc.requestedAt)} • atualizado em ${formatDate(doc.updatedAt)}</div>
+        </div>
+        <span class="doc-status ${safeText(doc.status)}">${documentStatusLabel(doc.status)}</span>
+      </div>
+
+      <div class="form-grid compact">
+        <label>
+          Status
+          <select data-doc-status="${doc.id}">
+            ${[
+              ['pending', 'Pendente'],
+              ['received', 'Recebido'],
+              ['review', 'Em conferência'],
+              ['resolved', 'Concluído']
+            ].map(([value, label]) => `<option value="${value}" ${doc.status === value ? 'selected' : ''}>${label}</option>`).join('')}
+          </select>
+        </label>
+
+        <label class="span-2">
+          Orientação ao cliente
+          <input data-doc-guidance="${doc.id}" value="${safeText(doc.guidance || '')}" placeholder="Orientação demonstrativa">
+        </label>
+
+        <button class="btn alt align-end" data-save-doc="${doc.id}">Salvar item</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function bindClientDetail(c) {
+  const interactionForm = document.querySelector('#interaction-form');
+  interactionForm.onsubmit = event => {
+    event.preventDefault();
+    const channel = document.querySelector('#interaction-channel').value;
+    const summary = document.querySelector('#interaction-summary').value.trim();
+    if (!summary) return;
+
+    const occurredAt = new Date().toISOString();
+    c.interactions.push({
+      id: uid('int'),
+      channel,
+      summary,
+      occurredAt
+    });
+    addTimeline(c, 'interaction', `Interação — ${channel}`, summary);
+    saveState();
+    detail(c.id);
+  };
+
+  const noteForm = document.querySelector('#note-form');
+  noteForm.onsubmit = event => {
+    event.preventDefault();
+    const text = document.querySelector('#note-text').value.trim();
+    if (!text) return;
+    c.notes.push({ id: uid('note'), text, createdAt: new Date().toISOString() });
+    addTimeline(c, 'note', 'Observação adicionada', text);
+    saveState();
+    detail(c.id);
+  };
+
+  const stageForm = document.querySelector('#stage-form');
+  stageForm.onsubmit = event => {
+    event.preventDefault();
+    const newStage = document.querySelector('#stage-select').value;
+    const next = document.querySelector('#next-action').value.trim() || 'Definir próxima ação';
+
+    if (newStage !== c.stage) {
+      const oldStage = c.stage;
+      c.stage = newStage;
+      addTimeline(c, 'stage', `Etapa alterada para ${newStage}`, `Etapa anterior: ${oldStage}.`);
+    }
+    c.next = next;
+    saveState();
+    detail(c.id);
+  };
+
+  document.querySelectorAll('[data-save-doc]').forEach(button => {
+    button.onclick = () => {
+      const id = button.dataset.saveDoc;
+      const doc = c.documents.find(d => d.id === id);
+      if (!doc) return;
+      const oldStatus = doc.status;
+      doc.status = document.querySelector(`[data-doc-status="${id}"]`).value;
+      doc.guidance = document.querySelector(`[data-doc-guidance="${id}"]`).value.trim();
+      doc.updatedAt = new Date().toISOString();
+
+      addTimeline(
+        c,
+        'document',
+        `Documento atualizado: ${doc.label}`,
+        `${documentStatusLabel(oldStatus)} → ${documentStatusLabel(doc.status)}${doc.guidance ? `. Orientação: ${doc.guidance}` : ''}`
+      );
+
+      refreshPendingSummary(c);
+      saveState();
+      detail(c.id);
+    };
+  });
+
+  const addDocumentForm = document.querySelector('#add-document-form');
+  addDocumentForm.onsubmit = event => {
+    event.preventDefault();
+    const label = document.querySelector('#new-doc-label').value.trim();
+    const guidance = document.querySelector('#new-doc-guidance').value.trim();
+    if (!label) return;
+
+    const now = new Date().toISOString();
+    c.documents.push({
+      id: uid('doc'),
+      label,
+      status: 'pending',
+      requestedAt: now,
+      updatedAt: now,
+      guidance
+    });
+    addTimeline(c, 'document', `Documento solicitado: ${label}`, guidance || 'Novo item documental demonstrativo.');
+    refreshPendingSummary(c);
+    saveState();
+    detail(c.id);
+  };
+}
+
+function detail(id) {
+  const c = getClient(id);
+  if (!c) return clientList();
+
+  currentClientId = id;
+  view = 'clients';
+
+  const days = getDaysSinceLastInteraction(c);
+  const latestNotes = [...c.notes].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  layout(`
+    <div class="top">
+      <div>
+        <button class="link-btn" id="back-clients">← Voltar para clientes</button>
+        <h1>Cliente 360º — ${safeText(c.name)}</h1>
+        <p class="sub">Visão da experiência e do acompanhamento. Não é análise de crédito.</p>
+      </div>
+      ${badge(c)}
+    </div>
+
+    <div class="grid4">
+      <div class="card metric"><strong>${c.score}/100</strong><span>Saúde da jornada</span></div>
+      <div class="card metric"><strong>${safeText(c.stage)}</strong><span>Etapa atual</span></div>
+      <div class="card metric"><strong>${days === null ? '—' : `${days} dia(s)`}</strong><span>Desde a última interação</span></div>
+      <div class="card metric"><strong>${activeDocumentCount(c)}</strong><span>Itens documentais ativos</span></div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <div class="section-head">
+        <div>
+          <h2>Jornada</h2>
+          <p class="small">A alteração de etapa entra automaticamente na timeline.</p>
+        </div>
+      </div>
+      <div class="journey">${journeyMarkup(c)}</div>
+
+      <form id="stage-form" class="form-grid stage-editor">
+        <label>
+          Etapa atual
+          <select id="stage-select">
+            ${stages.map(stage => `<option ${stage === c.stage ? 'selected' : ''}>${stage}</option>`).join('')}
+          </select>
+        </label>
+        <label class="span-2">
+          Próxima ação
+          <input id="next-action" value="${safeText(c.next)}" placeholder="Próxima ação de acompanhamento">
+        </label>
+        <button class="btn align-end" type="submit">Atualizar jornada</button>
+      </form>
+    </div>
+
+    <section class="cols">
+      <div class="card">
+        <h2>Registrar interação</h2>
+        <form id="interaction-form" class="form-grid">
+          <label>
+            Canal
+            <select id="interaction-channel">
+              <option>Telefone</option>
+              <option>WhatsApp demonstrativo</option>
+              <option>E-mail demonstrativo</option>
+              <option>Atendimento presencial</option>
+              <option>Acompanhamento</option>
+            </select>
+          </label>
+          <label class="span-2">
+            Resumo
+            <textarea id="interaction-summary" rows="3" placeholder="Ex.: cliente orientado sobre o documento pendente." required></textarea>
+          </label>
+          <button class="btn alt align-end" type="submit">Registrar interação</button>
+        </form>
+
+        <h2 class="section-space">Observações</h2>
+        <form id="note-form" class="form-grid">
+          <label class="span-3">
+            Nova observação
+            <textarea id="note-text" rows="2" placeholder="Observação interna do acompanhamento"></textarea>
+          </label>
+          <button class="btn align-end" type="submit">Adicionar</button>
+        </form>
+
+        <div class="notes-list">
+          ${latestNotes.length ? latestNotes.slice(0, 4).map(note => `
+            <div class="note">
+              <p>${safeText(note.text)}</p>
+              <span class="small">${formatDate(note.createdAt)}</span>
+            </div>`).join('') : '<p class="small">Nenhuma observação registrada.</p>'}
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Resumo de acompanhamento</h2>
+        <div class="reason"><b>Pendência:</b><br>${safeText(c.pending)}</div>
+        <div class="reason"><b>Próxima ação:</b><br>${safeText(c.next)}</div>
+        <div class="reason"><b>Interações registradas:</b><br>${c.interactions.length}</div>
+        <p class="small">As alterações desta versão ficam somente no navegador utilizado para a demonstração.</p>
+      </div>
+    </section>
+
+    <div class="card" style="margin-top:18px">
+      <div class="section-head">
+        <div>
+          <h2>Checklist documental</h2>
+          <p class="small">Controle de status e orientação. Nenhum arquivo pessoal real é armazenado.</p>
+        </div>
+      </div>
+
+      <div>${documentMarkup(c)}</div>
+
+      <details class="add-doc">
+        <summary>Adicionar item documental fictício</summary>
+        <form id="add-document-form" class="form-grid">
+          <label>
+            Documento / item
+            <input id="new-doc-label" placeholder="Ex.: comprovante complementar" required>
+          </label>
+          <label class="span-2">
+            Orientação
+            <input id="new-doc-guidance" placeholder="Orientação que será apresentada ao cliente">
+          </label>
+          <button class="btn align-end" type="submit">Adicionar</button>
+        </form>
+      </details>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <div class="section-head">
+        <div>
+          <h2>Timeline da jornada</h2>
+          <p class="small">Etapas, interações, documentos e observações em ordem cronológica.</p>
+        </div>
+      </div>
+      <div class="timeline">${timelineMarkup(c)}</div>
+    </div>
+
+    <section class="cols">
+      <div class="card">
+        <h2>Histórico recente de interações</h2>
+        ${[...c.interactions]
+          .sort((a, b) => new Date(b.occurredAt) - new Date(a.occurredAt))
+          .slice(0, 5)
+          .map(item => `
+            <div class="reason">
+              <b>${safeText(item.channel)}</b>
+              <div>${safeText(item.summary)}</div>
+              <span class="small">${formatDate(item.occurredAt)}</span>
+            </div>`).join('') || '<p class="small">Nenhuma interação registrada.</p>'}
+      </div>
+
+      <div class="card">
+        <h2>Por que este score?</h2>
+        <div class="score">${c.score}</div>
+        <div class="reason">Evolução da jornada</div>
+        <div class="reason">Situação documental</div>
+        <div class="reason">Pendências e tempo sem atualização</div>
+        <p class="small">O Health Score ainda é demonstrativo nesta etapa. O cálculo automático será implementado separadamente. Renda, idade, gênero, endereço e outros atributos pessoais não entram no cálculo.</p>
+      </div>
+    </section>
+  `);
+
+  document.querySelector('#back-clients').onclick = clientList;
+  bindClientDetail(c);
+}
+
+function priorities() {
+  layout(`
+    <div class="top">
+      <div>
+        <h1>Central de Prioridades</h1>
+        <p class="sub">Motivo da sinalização + próxima ação, sem associação a risco de crédito.</p>
+      </div>
+    </div>
+    <div class="grid4">
+      ${[
+        ['5', 'Acompanhamento'],
+        ['11', 'Em atenção'],
+        ['7', 'Pendências documentais'],
+        ['4', 'Sem interação']
+      ].map(x => `<div class="card metric"><strong>${x[0]}</strong><span>${x[1]}</span></div>`).join('')}
+    </div>
+    <div class="card" style="margin-top:18px">
+      <h2>Quem precisa de acompanhamento hoje</h2>
+      ${clients.filter(c => c.status !== 'healthy').map(c => `
+        <div class="row">
+          <div><b>${safeText(c.name)}</b><div class="small">${safeText(c.stage)}</div></div>
+          <div>${safeText(c.pending)}<div class="small">Próxima ação: ${safeText(c.next)}</div></div>
+          <div>${badge(c)}</div>
+        </div>`).join('')}
+    </div>
+    <p class="notice">Prioridade indica necessidade de acompanhamento da experiência. Não representa risco de crédito, elegibilidade ou probabilidade de aprovação.</p>
+  `);
+}
+
+function cx() {
+  layout(`
+    <div class="top">
+      <div>
+        <h1>Voz do Cliente</h1>
+        <p class="sub">Feedback transformado em aprendizado sobre a jornada.</p>
+      </div>
+    </div>
+    <div class="grid4">
+      <div class="card metric"><strong>4,3/5</strong><span>CSAT demonstrativo</span></div>
+      <div class="card metric"><strong>+42</strong><span>NPS demonstrativo</span></div>
+      <div class="card metric"><strong>76%</strong><span>Conclusão</span></div>
+      <div class="card metric"><strong>24%</strong><span>Interrupção</span></div>
+    </div>
+    <section class="cols">
+      <div class="card">
+        <h2>Atritos mais citados</h2>
+        <div class="reason">Documentação — 41%</div>
+        <div class="reason">Tempo de espera — 28%</div>
+        <div class="reason">Comunicação/status — 19%</div>
+        <div class="reason">Outros — 12%</div>
+      </div>
+      <div class="card">
+        <h2>Comentários fictícios</h2>
+        <p>“Gostei de saber exatamente o que faltava.”</p>
+        <p>“Queria receber atualização mesmo quando ainda estivesse aguardando.”</p>
+        <p class="small">A IA futura poderá classificar temas e resumir feedback, mas não decidirá questões financeiras.</p>
+      </div>
+    </section>
+  `);
+}
+
+function customer() {
+  const c = clients[0];
+  const activeDocs = c.documents.filter(d => d.status !== 'resolved');
+
+  layout(`
+    <div class="top">
+      <div>
+        <h1>Experiência mobile do cliente</h1>
+        <p class="sub">A tela deve responder: onde estou, preciso fazer algo e qual é o próximo passo?</p>
+      </div>
+    </div>
+
+    <div class="mobile-wrap">
+      <div class="phone">
+        <div class="small">Jornada360</div>
+        <h2>Olá, ${safeText(c.name.split(' ')[0])}</h2>
+        <p class="small">Sua jornada demonstrativa está em andamento.</p>
+        <div class="progress"><i></i></div>
+        <p><b>Etapa atual:</b> ${safeText(c.stage)}</p>
+
+        <div class="action-box">
+          <b>Você precisa fazer algo agora?</b>
+          <h3>${activeDocs.length ? 'Sim' : 'Não'}</h3>
+          <p>${activeDocs.length ? safeText(activeDocs[0].guidance || activeDocs[0].label) : 'Nenhuma ação documental pendente no momento.'}</p>
+          <button class="btn">Ver orientação</button>
+        </div>
+
+        <div class="card">
+          <b>Próximo passo</b>
+          <p>${safeText(c.next)}</p>
+          <span class="small">Última atualização: ${getDaysSinceLastInteraction(c)} dia(s)</span>
+        </div>
+
+        <h3>Como foi sua experiência até aqui?</h3>
+        <div class="survey">
+          ${[1,2,3,4,5].map(n => `<button>${n}</button>`).join('')}
+        </div>
+
+        <p class="notice">Demonstração de portfólio. O acompanhamento exibido não representa aprovação ou decisão de instituição financeira.</p>
+      </div>
+    </div>
+  `);
+}
+
+function render() {
+  ({
+    dashboard,
+    clients: clientList,
+    priorities,
+    cx,
+    customer
+  }[view] || dashboard)();
+}
+
+render();
