@@ -115,7 +115,8 @@ Além das telas de Dashboard CX/CS, Carteira, Cliente 360º, Central de Priorida
 - visualizar uma timeline com o histórico da jornada.
 - visualizar o progresso real da jornada por etapa e percentual;
 - distinguir avanços e retornos de etapa na timeline;
+- recalcular automaticamente o Journey Health Score e explicar seus fatores;
 
-O Health Score, as métricas consolidadas do dashboard, CSAT/NPS e a priorização automática continuam demonstrativos e serão evoluídos nas próximas etapas.
+O Journey Health Score já é recalculado automaticamente e exibe os fatores que compõem a pontuação. As métricas consolidadas do dashboard, CSAT/NPS e a priorização automática ainda serão evoluídas nas próximas etapas.
 
 O Figma será retomado apenas no acabamento final, após os fluxos e regras estarem consolidados.

@@ -114,3 +114,21 @@ A interface agora apresenta:
 - progresso dinâmico também na visão mobile do cliente.
 
 O retorno para uma etapa anterior não apaga eventos anteriores. Isso é intencional para preservar a rastreabilidade da jornada.
+
+## Journey Health Score automático
+
+O Journey Health Score deixou de ser um número fixo da massa demonstrativa e passou a ser recalculado a partir do estado atual da jornada.
+
+São considerados:
+- evolução da etapa;
+- situação documental;
+- antiguidade de pendências;
+- tempo desde a última interação;
+- tempo desde a última atualização da jornada;
+- satisfação, quando disponível.
+
+O Cliente 360º mostra a decomposição da pontuação e os fatores que exigem atenção.
+
+A ausência de pesquisa de satisfação recebe valor neutro e não gera alerta isoladamente.
+
+O indicador continua estritamente separado de análise de crédito, elegibilidade e decisão financeira.

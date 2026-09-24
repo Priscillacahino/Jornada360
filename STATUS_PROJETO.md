@@ -36,9 +36,9 @@
 - Voz do Cliente demonstrativa;
 - experiência mobile demonstrativa;
 - mensagens explícitas separando saúde da jornada de risco de crédito.
+- Journey Health Score automático, programático e explicável;
 
 ## Próxima evolução sem terceiros
-- cálculo programático e explicável do Journey Health Score;
 - Central de Prioridades baseada nos próprios dados;
 - formulário CSAT/NPS funcional;
 - dashboard alimentado pelos dados do MVP;

@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'jornada360_mvp_v2';
-const STORAGE_VERSION = 3;
+const STORAGE_VERSION = 4;
 
 const stages = [
   'Necessidade',
@@ -200,6 +200,7 @@ function normalizeClient(client, index = 0) {
     interactions: Array.isArray(client.interactions) ? client.interactions : [],
     documents: Array.isArray(client.documents) ? client.documents : [],
     notes: Array.isArray(client.notes) ? client.notes : [],
+    surveys: Array.isArray(client.surveys) ? client.surveys : [],
     timeline: Array.isArray(client.timeline) ? client.timeline.map(normalizeTimelineEvent) : []
   };
 }
@@ -228,7 +229,22 @@ let view = 'dashboard';
 let currentClientId = null;
 const app = document.querySelector('#app');
 
+function recalculateClientHealth(c) {
+  const health = JornadaHealth.calculateHealthScore(c, stages);
+  c.score = health.total;
+  c.status = health.status;
+  c.healthCalculatedAt = health.calculatedAt;
+  return health;
+}
+
+function recalculateAllHealth() {
+  clients.forEach(recalculateClientHealth);
+}
+
+recalculateAllHealth();
+
 function saveState() {
+  recalculateAllHealth();
   state = { version: STORAGE_VERSION, clients };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   const indicator = document.querySelector('#save-indicator');
@@ -278,6 +294,27 @@ function getDaysSinceLastInteraction(c) {
 
 function activeDocumentCount(c) {
   return c.documents.filter(d => !['resolved'].includes(d.status)).length;
+}
+
+function healthBreakdownMarkup(health) {
+  const factorRows = health.factors.map(item => `
+    <div class="health-factor ${item.severity}">
+      <div class="health-factor-head">
+        <b>${safeText(item.label)}</b>
+        <strong>${item.points}/${item.max}</strong>
+      </div>
+      <p>${safeText(item.message)}</p>
+    </div>
+  `).join('');
+
+  const alerts = health.alerts.length
+    ? `<div class="health-alerts">
+        <b>Fatores que pedem atenção</b>
+        <ul>${health.alerts.map(item => `<li>${safeText(item.label)}: ${safeText(item.message)}</li>`).join('')}</ul>
+      </div>`
+    : `<div class="health-ok">Nenhum fator crítico identificado neste momento.</div>`;
+
+  return `${factorRows}${alerts}`;
 }
 
 function refreshPendingSummary(c) {
@@ -336,6 +373,7 @@ function layout(content) {
 }
 
 function dashboard() {
+  recalculateAllHealth();
   layout(`
     <div class="top">
       <div>
@@ -396,6 +434,7 @@ function clientList() {
   `);
 
   const draw = () => {
+    recalculateAllHealth();
     const q = document.querySelector('#q').value.toLowerCase();
     const f = document.querySelector('#filter').value;
     const filtered = clients.filter(c =>
@@ -614,6 +653,7 @@ function detail(id) {
   currentClientId = id;
   view = 'clients';
 
+  const health = recalculateClientHealth(c);
   const days = getDaysSinceLastInteraction(c);
   const latestNotes = [...c.notes].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const progress = getJourneyProgress(c);
@@ -629,7 +669,7 @@ function detail(id) {
     </div>
 
     <div class="grid4">
-      <div class="card metric"><strong>${c.score}/100</strong><span>Saúde da jornada</span></div>
+      <div class="card metric"><strong>${c.score}/100</strong><span>Saúde da jornada • cálculo automático</span></div>
       <div class="card metric"><strong>${safeText(c.stage)}</strong><span>Etapa atual</span></div>
       <div class="card metric"><strong>${days === null ? '—' : `${days} dia(s)`}</strong><span>Desde a última interação</span></div>
       <div class="card metric"><strong>${activeDocumentCount(c)}</strong><span>Itens documentais ativos</span></div>
@@ -776,12 +816,15 @@ function detail(id) {
       </div>
 
       <div class="card">
-        <h2>Por que este score?</h2>
-        <div class="score">${c.score}</div>
-        <div class="reason">Evolução da jornada</div>
-        <div class="reason">Situação documental</div>
-        <div class="reason">Pendências e tempo sem atualização</div>
-        <p class="small">O Health Score ainda é demonstrativo nesta etapa. O cálculo automático será implementado separadamente. Renda, idade, gênero, endereço e outros atributos pessoais não entram no cálculo.</p>
+        <div class="health-score-title">
+          <div>
+            <h2>Por que este score?</h2>
+            <p class="small">Cálculo automático da saúde da jornada.</p>
+          </div>
+          <div class="score">${health.total}</div>
+        </div>
+        ${healthBreakdownMarkup(health)}
+        <p class="notice health-disclaimer"><b>Importante:</b> este indicador mede acompanhamento de CX/CS. Não representa score de crédito, risco financeiro, elegibilidade ou probabilidade de aprovação. Renda, idade, gênero, endereço, raça, religião, saúde e outros atributos pessoais não entram no cálculo.</p>
       </div>
     </section>
   `);
@@ -791,6 +834,7 @@ function detail(id) {
 }
 
 function priorities() {
+  recalculateAllHealth();
   layout(`
     <div class="top">
       <div>
