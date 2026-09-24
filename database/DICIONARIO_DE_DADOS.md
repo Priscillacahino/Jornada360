@@ -10,7 +10,7 @@
 | interactions | channel / summary / occurred_at | Histórico de relacionamento |
 | notes | text / created_at | Observações internas de acompanhamento |
 | tasks | due_at/status | Próximas ações |
-| survey_responses | survey_type/score | CSAT/NPS |
+| survey_responses | survey_type / score / comment / answered_at | CSAT/NPS e Voz do Cliente |
 | voc_items | category/text | Voz do Cliente |
 | health_score_snapshots | total_score/reasons | Saúde explicável da jornada |
 | audit_events | event_type/occurred_at | Rastreabilidade demonstrativa |
@@ -20,6 +20,12 @@
 - `received`: recebido;
 - `review`: em conferência;
 - `resolved`: concluído.
+
+## Pesquisas no MVP
+- `csat`: nota de 1 a 5; influencia somente o componente de satisfação do Journey Health Score;
+- `nps`: nota de 0 a 10, exibida no pós-atendimento; não altera decisão financeira nem score de crédito;
+- `comment`: comentário fictício opcional;
+- `answeredAt`: data/hora da resposta local.
 
 ## Persistência local
 O MVP funcional usa `localStorage` somente para demonstrar continuidade do acompanhamento entre recargas do navegador.

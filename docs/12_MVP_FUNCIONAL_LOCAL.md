@@ -150,3 +150,23 @@ Ela:
 O bloco **Prioridades de hoje** do dashboard utiliza a mesma regra de ordenação.
 
 A prioridade continua restrita ao acompanhamento de CX/CS e não representa risco ou decisão financeira.
+
+
+## Evolução integrada — Dashboard e Voz do Cliente
+
+A versão v6 consolida o MVP funcional local:
+- Dashboard calculado com a carteira atual, sem números fixos;
+- 24 clientes fictícios na massa demonstrativa;
+- distribuição de clientes por etapa;
+- insight CX determinístico baseado nos fatores mais frequentes do Journey Health Score;
+- CSAT funcional de 1 a 5;
+- NPS funcional de 0 a 10 no pós-atendimento;
+- comentários fictícios de Voz do Cliente;
+- indicadores CSAT, NPS, respostas e conclusão calculados em tempo real;
+- atritos consolidados a partir dos fatores de atenção da carteira;
+- persistência das pesquisas em `localStorage`;
+- melhorias de acessibilidade e responsividade;
+- suíte de testes executável com `npm test`.
+
+### Migração local
+Ao abrir a v6, clientes já alterados no navegador são preservados. Os novos clientes fictícios são acrescentados à massa local e respostas demonstrativas de pesquisa são incluídas apenas quando não existirem respostas anteriores para aquele cliente.

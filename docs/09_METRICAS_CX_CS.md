@@ -3,37 +3,22 @@
 ## Métricas principais
 
 ### CSAT
-Mede satisfação com momentos específicos, como atendimento ou resolução de pendência.
+Mede satisfação com momentos específicos, como atendimento ou resolução de pendência. No MVP, usa escala de 1 a 5 e pode ser atualizado na visão mobile do cliente.
 
 ### NPS
-Utilizado no encerramento para registrar disposição declarada de recomendação da experiência de atendimento.
+Utilizado no pós-atendimento para registrar disposição declarada de recomendação da experiência, em escala de 0 a 10. No MVP, o NPS é calculado como percentual de promotores menos percentual de detratores.
 
-### Taxa de conclusão da jornada
-Percentual de jornadas demonstrativas concluídas em relação às encerradas no período.
-
-### Taxa de interrupção
-Percentual de jornadas encerradas antes da conclusão, com motivo registrado quando disponível.
-
-### Tempo médio por etapa
-Ajuda a identificar onde a jornada permanece mais tempo.
+### Taxa demonstrativa de conclusão
+No Dashboard/VoC local, corresponde ao percentual da carteira que está na etapa **Pós-atendimento**. Não deve ser confundida com uma taxa histórica de conversão.
 
 ### Tempo sem interação
 Apoia acompanhamento proativo e a Central de Prioridades.
 
-### Pendências por categoria
-Identifica quais tipos de solicitação geram maior volume de atrito.
-
-### First Response / retorno de acompanhamento
-Tempo entre um evento que exige acompanhamento e o primeiro registro de ação do profissional.
+### Atritos da carteira
+São consolidados a partir dos fatores de atenção do Journey Health Score. O percentual indica quantos clientes da carteira possuem cada fator.
 
 ## Voz do Cliente
-Comentários são classificados em categorias demonstrativas:
-- elogio;
-- dúvida;
-- dificuldade documental;
-- comunicação/status;
-- tempo de espera;
-- sugestão;
-- outros.
+Comentários de CSAT/NPS são armazenados apenas localmente e são fictícios. A classificação futura por tema permanece como possibilidade de apoio, não como decisão financeira.
 
-A classificação serve para identificar padrões de experiência e não para decisões financeiras.
+## Implementação do MVP
+As métricas deixam de ser números fixos e passam a ser calculadas a partir do estado atual da massa fictícia em `localStorage`.

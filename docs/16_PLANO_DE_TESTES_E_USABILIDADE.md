@@ -65,3 +65,18 @@ Teste automatizado:
 
 O teste valida ordenação, motivo explicável, métricas e contagem de jornadas que precisam de ação.
 
+
+
+## Dashboard, CSAT/NPS e analytics
+
+Testes manuais adicionais:
+1. confirmar que os quatro indicadores da Visão Geral mudam conforme a carteira;
+2. conferir distribuição por etapa;
+3. validar o insight CX e o principal atrito;
+4. na Visão do cliente, selecionar um cliente fictício e salvar CSAT;
+5. selecionar um cliente em Pós-atendimento e salvar NPS;
+6. abrir Voz do Cliente e confirmar atualização de métricas e comentários;
+7. recarregar a página e confirmar persistência das pesquisas;
+8. navegar por teclado e verificar foco visível.
+
+Teste consolidado: `npm test`.

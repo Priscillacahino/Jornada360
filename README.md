@@ -75,7 +75,7 @@ Necessidade → Primeiro atendimento → Diagnóstico inicial → Documentação
 
 🟡 Em desenvolvimento — fundação e especificação concluídas; MVP funcional local em evolução.
 
-A versão atual já possui **persistência local demonstrativa**, **Cliente 360º interativo**, **checklist documental funcional** e **timeline da jornada**. O Figma permanece adiado para a etapa final de acabamento visual.
+A versão atual já possui **persistência local**, **Cliente 360º interativo**, **checklist documental**, **timeline**, **Journey Health Score automático**, **Central de Prioridades dinâmica**, **Dashboard calculado pela carteira** e **CSAT/NPS funcionais**. O Figma permanece adiado para a etapa final de acabamento visual.
 
 ## Documentação já estruturada
 
@@ -117,7 +117,15 @@ Além das telas de Dashboard CX/CS, Carteira, Cliente 360º, Central de Priorida
 - distinguir avanços e retornos de etapa na timeline;
 - recalcular automaticamente o Journey Health Score e explicar seus fatores;
 - priorizar automaticamente jornadas com motivo e próxima ação;
+- calcular o Dashboard com os dados da própria carteira;
+- registrar CSAT/NPS e comentários fictícios na visão do cliente;
+- consolidar Voz do Cliente e atritos a partir dos registros locais;
+- executar testes automatizados por `npm test`;
 
-O Journey Health Score já é recalculado automaticamente e exibe os fatores que compõem a pontuação. A Central de Prioridades já usa os dados do MVP e os fatores do Journey Health Score para ordenar o acompanhamento. As métricas consolidadas do dashboard e CSAT/NPS ainda serão evoluídos nas próximas etapas.
+O Journey Health Score já é recalculado automaticamente e exibe os fatores que compõem a pontuação. A Central de Prioridades, o Dashboard e a Voz do Cliente já usam os dados do próprio MVP. CSAT e NPS podem ser registrados na visão mobile e permanecem salvos localmente. A massa demonstrativa foi ampliada para 24 clientes fictícios e há testes automatizados das regras principais.
 
 O Figma será retomado apenas no acabamento final, após os fluxos e regras estarem consolidados.
+
+## Testes automatizados
+
+Na raiz do projeto, execute `npm test`. O repositório também inclui um workflow do GitHub Actions para validar as regras principais a cada push ou pull request para `main`.

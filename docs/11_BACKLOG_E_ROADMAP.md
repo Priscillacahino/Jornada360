@@ -19,9 +19,9 @@ Personas, cenários, fluxos, métricas, Health Score v2, privacidade, modelo de 
 - filtros e Cliente 360º [concluído];
 - Central de Prioridades dinâmica [concluído];
 - cálculo explicável do Health Score [concluído];
-- pesquisas e dashboard CX [próximos].
+- pesquisas e dashboard CX [concluídos no MVP local].
 
-## Fase 5 — Qualidade
+## Fase 5 — Qualidade [em andamento]
 - testes funcionais;
 - acessibilidade;
 - responsividade;

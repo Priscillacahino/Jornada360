@@ -71,7 +71,7 @@ function client(overrides = {}) {
     documents: [{ status: 'resolved', requestedAt: ago(8), updatedAt: ago(1) }],
     interactions: [{ occurredAt: ago(1) }],
     timeline: [{ type: 'stage-forward', occurredAt: ago(1) }],
-    surveys: [{ score: 5, answeredAt: ago(0) }]
+    surveys: [{ type: 'csat', score: 5, answeredAt: ago(0) }]
   });
   const health = calculateHealthScore(c, stages, { now: NOW });
   assert.strictEqual(health.total, 100);

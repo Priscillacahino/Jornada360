@@ -48,26 +48,31 @@
 
   function satisfactionInfo(client) {
     const surveys = Array.isArray(client.surveys) ? client.surveys : [];
-    if (!surveys.length) {
+    const csatSurveys = surveys.filter(item => {
+      const score = Number(item && item.score);
+      return item && (item.type === 'csat' || (!item.type && score >= 1 && score <= 5));
+    });
+
+    if (!csatSurveys.length) {
       return {
         points: 5,
-        message: 'Pesquisa ainda não coletada: 5/10 (valor neutro; não gera alerta).',
+        message: 'CSAT ainda não coletado: 5/10 (valor neutro; não gera alerta).',
         neutral: true
       };
     }
 
-    const latest = [...surveys].sort((a, b) =>
+    const latest = [...csatSurveys].sort((a, b) =>
       new Date(b.answeredAt || 0) - new Date(a.answeredAt || 0)
     )[0];
 
     const score = Number(latest.score);
     if (score >= 4) {
-      return { points: 10, message: 'Satisfação positiva disponível.', neutral: false };
+      return { points: 10, message: `CSAT positivo disponível: ${score}/5.`, neutral: false };
     }
     if (score === 3) {
-      return { points: 6, message: 'Satisfação neutra disponível.', neutral: false };
+      return { points: 6, message: 'CSAT neutro disponível: 3/5.', neutral: false };
     }
-    return { points: 2, message: 'Satisfação negativa disponível.', neutral: false };
+    return { points: 2, message: `CSAT negativo disponível: ${score}/5.`, neutral: false };
   }
 
   function factor(id, label, points, max, message, neutral = false) {

@@ -49,14 +49,14 @@ journey 1:N documents/pending_items/interactions/notes/tasks/surveys/health_snap
 
 journey N:1 current_stage
 
-## Mapeamento do MVP local
+## Mapeamento do MVP local v6
 
 Na versão local demonstrativa, `localStorage` representa temporariamente uma estrutura agregada por cliente contendo:
-
 - jornada atual;
 - interações;
 - documentos;
 - observações;
+- respostas CSAT/NPS;
 - eventos de timeline.
 
 Essa estrutura é deliberadamente simples para a demonstração e preserva a correspondência conceitual com o esquema lógico acima. Não é banco de dados de produção.

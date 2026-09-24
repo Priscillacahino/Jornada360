@@ -1,0 +1,10 @@
+{
+  "name": "jornada360-mvp",
+  "version": "0.6.0",
+  "private": true,
+  "description": "MVP demonstrativo local de CX/CS do Jornada360",
+  "scripts": {
+    "test": "node tests/health-score.test.js && node tests/priorities.test.js && node tests/analytics.test.js",
+    "check": "npm test"
+  }
+}

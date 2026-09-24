@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'jornada360_mvp_v2';
-const STORAGE_VERSION = 5;
+const STORAGE_VERSION = 6;
 
 const stages = [
   'Necessidade',
@@ -107,46 +107,69 @@ function timelineKindLabel(type) {
     'stage-back': 'Retorno de etapa',
     'interaction': 'Interação',
     'document': 'Documento',
-    'note': 'Observação'
+    'note': 'Observação',
+    'survey': 'Pesquisa de experiência'
   })[type] || 'Evento';
 }
 
 function createSeedClient(data, index) {
   const id = `cliente-${index + 1}`;
   const stageIndex = Math.max(0, stages.indexOf(data.stage));
+  const documentStageIndex = stages.indexOf('Documentação');
   const interactions = [{
-    id: uid('int'),
+    id: `int-seed-${index + 1}`,
     channel: 'Acompanhamento',
     summary: `Último acompanhamento demonstrativo de ${data.name}.`,
     occurredAt: daysAgoISO(data.last)
   }];
 
-  const documents = data.pending === 'Nenhuma'
-    ? [
-        {
-          id: uid('doc'),
-          label: 'Documentação principal',
-          status: 'resolved',
-          requestedAt: daysAgoISO(Math.max(data.last + 5, 6)),
-          updatedAt: daysAgoISO(Math.max(data.last, 1)),
-          guidance: 'Documentação demonstrativa concluída.'
-        }
-      ]
-    : [
-        {
-          id: uid('doc'),
-          label: data.pending.includes('Documento') ? 'Documento solicitado' : 'Comprovante complementar',
-          status: data.stage === 'Documentação' ? 'pending' : 'review',
-          requestedAt: daysAgoISO(Math.max(data.last + 2, 4)),
-          updatedAt: daysAgoISO(Math.max(data.last, 1)),
-          guidance: data.next
-        }
-      ];
+  const hasDocumentPending = /document|comprovante/i.test(data.pending || '');
+  let documents = [];
+
+  if (hasDocumentPending) {
+    documents = [{
+      id: `doc-seed-${index + 1}`,
+      label: /comprovante/i.test(data.pending) ? 'Comprovante complementar' : 'Documento solicitado',
+      status: data.stage === 'Documentação' ? 'pending' : 'review',
+      requestedAt: daysAgoISO(Math.max(data.last + 2, 4)),
+      updatedAt: daysAgoISO(Math.max(data.last, 1)),
+      guidance: data.next
+    }];
+  } else if (stageIndex >= documentStageIndex) {
+    documents = [{
+      id: `doc-seed-${index + 1}`,
+      label: 'Documentação principal',
+      status: 'resolved',
+      requestedAt: daysAgoISO(Math.max(data.last + 5, 6)),
+      updatedAt: daysAgoISO(Math.max(data.last, 1)),
+      guidance: 'Documentação demonstrativa concluída.'
+    }];
+  }
+
+  const surveys = [];
+  if (Number.isFinite(data.csat)) {
+    surveys.push({
+      id: `survey-seed-${index + 1}-csat`,
+      type: 'csat',
+      score: data.csat,
+      comment: data.comment || '',
+      answeredAt: daysAgoISO(Math.max(data.last, 0))
+    });
+  }
+  if (Number.isFinite(data.nps)) {
+    surveys.push({
+      id: `survey-seed-${index + 1}-nps`,
+      type: 'nps',
+      score: data.nps,
+      comment: data.npsComment || '',
+      answeredAt: daysAgoISO(Math.max(data.last, 0))
+    });
+  }
 
   const timeline = [];
   for (let i = 0; i <= stageIndex; i += 1) {
     timeline.push({
-      id: uid('evt'),
+      id: `evt-seed-${index + 1}-${i + 1}`,
       type: 'stage',
       title: i === stageIndex ? `Etapa registrada: ${stages[i]}` : `Etapa concluída: ${stages[i]}`,
       detail: i === stageIndex
@@ -156,7 +179,7 @@ function createSeedClient(data, index) {
     });
   }
   timeline.push({
-    id: uid('evt'),
+    id: `evt-seed-${index + 1}-interaction`,
     type: 'interaction',
     title: 'Interação registrada',
     detail: interactions[0].summary,
@@ -174,19 +197,39 @@ function createSeedClient(data, index) {
     interactions,
     documents,
     notes: [],
+    surveys,
     timeline
   };
 }
 
-const seedClients = [
+const seedData = [
   {name:'Mariana Costa',stage:'Documentação',score:68,status:'attention',last:3,pending:'Comprovante complementar',next:'Confirmar recebimento do documento'},
-  {name:'Carlos Mendes',stage:'Documentação',score:42,status:'high',last:11,pending:'Documento pendente há 11 dias',next:'Confirmar dificuldade no envio'},
-  {name:'Fernanda Lima',stage:'Análise',score:47,status:'high',last:15,pending:'Sem interação há 15 dias',next:'Realizar contato de acompanhamento'},
-  {name:'Pedro Alves',stage:'Diagnóstico',score:73,status:'attention',last:2,pending:'Nova solicitação documental',next:'Orientar sobre documento solicitado'},
-  {name:'Ana Ribeiro',stage:'Análise',score:76,status:'attention',last:8,pending:'Etapa sem atualização há 8 dias',next:'Verificar andamento e atualizar status'},
-  {name:'Luiza Rocha',stage:'Preparação para contrato',score:91,status:'healthy',last:1,pending:'Nenhuma',next:'Orientar etapa final'},
-  {name:'Rafael Souza',stage:'Pós-atendimento',score:95,status:'healthy',last:0,pending:'Nenhuma',next:'Coletar NPS'}
-].map(createSeedClient);
+  {name:'Carlos Mendes',stage:'Documentação',score:42,status:'high',last:11,pending:'Documento pendente há 11 dias',next:'Confirmar dificuldade no envio',csat:2,comment:'Tive dificuldade para entender qual documento ainda faltava.'},
+  {name:'Fernanda Lima',stage:'Análise',score:47,status:'high',last:15,pending:'Sem interação há 15 dias',next:'Realizar contato de acompanhamento',csat:2,comment:'Queria receber atualização mesmo quando ainda estivesse aguardando.'},
+  {name:'Pedro Alves',stage:'Diagnóstico',score:73,status:'attention',last:2,pending:'Nova solicitação documental',next:'Orientar sobre documento solicitado',csat:4,comment:'A orientação inicial foi clara.'},
+  {name:'Ana Ribeiro',stage:'Análise',score:76,status:'attention',last:8,pending:'Etapa sem atualização há 8 dias',next:'Verificar andamento e atualizar status',csat:3},
+  {name:'Luiza Rocha',stage:'Preparação para contrato',score:91,status:'healthy',last:1,pending:'Nenhuma',next:'Orientar etapa final',csat:5,comment:'Gostei de saber exatamente o que faltava em cada etapa.'},
+  {name:'Rafael Souza',stage:'Pós-atendimento',score:95,status:'healthy',last:0,pending:'Nenhuma',next:'Encerrar acompanhamento',csat:5,nps:9,comment:'O acompanhamento deixou o processo mais previsível.',npsComment:'Eu recomendaria a experiência de acompanhamento.'},
+  {name:'Beatriz Santos',stage:'Pós-atendimento',score:90,status:'healthy',last:2,pending:'Nenhuma',next:'Encerrar acompanhamento',csat:4,nps:8,comment:'Foi fácil visualizar o próximo passo.'},
+  {name:'João Almeida',stage:'Retorno da instituição',score:72,status:'attention',last:5,pending:'Nenhuma',next:'Atualizar cliente sobre o retorno',csat:3,comment:'A espera poderia ser comunicada com mais frequência.'},
+  {name:'Camila Nunes',stage:'Documentação',score:54,status:'attention',last:9,pending:'Comprovante complementar',next:'Reforçar orientação documental',csat:2,comment:'Ainda tenho dúvida sobre o comprovante solicitado.'},
+  {name:'Marcos Oliveira',stage:'Contratação',score:88,status:'healthy',last:2,pending:'Nenhuma',next:'Confirmar agenda de contratação',csat:4},
+  {name:'Juliana Ferreira',stage:'Pós-atendimento',score:96,status:'healthy',last:1,pending:'Nenhuma',next:'Encerrar acompanhamento',csat:5,nps:10,comment:'A comunicação foi clara do início ao fim.'},
+  {name:'Renata Barbosa',stage:'Diagnóstico',score:79,status:'attention',last:1,pending:'Nenhuma',next:'Concluir diagnóstico inicial',csat:4},
+  {name:'André Martins',stage:'Análise',score:82,status:'healthy',last:4,pending:'Nenhuma',next:'Acompanhar retorno da análise',csat:4},
+  {name:'Patrícia Gomes',stage:'Primeiro atendimento',score:84,status:'healthy',last:0,pending:'Nenhuma',next:'Realizar diagnóstico inicial'},
+  {name:'Eduardo Lima',stage:'Retorno da instituição',score:61,status:'attention',last:12,pending:'Sem atualização há 12 dias',next:'Retomar acompanhamento',csat:3},
+  {name:'Sofia Araújo',stage:'Preparação para contrato',score:89,status:'healthy',last:3,pending:'Nenhuma',next:'Orientar documentos para contratação',csat:5},
+  {name:'Bruno Costa',stage:'Pós-atendimento',score:91,status:'healthy',last:2,pending:'Nenhuma',next:'Encerrar acompanhamento',csat:4,nps:7},
+  {name:'Larissa Melo',stage:'Documentação',score:58,status:'attention',last:6,pending:'Documento complementar',next:'Confirmar envio do documento',csat:3,comment:'A lista de documentos ajudou, mas ainda precisei tirar uma dúvida.'},
+  {name:'Thiago Rocha',stage:'Análise',score:49,status:'high',last:10,pending:'Comprovante complementar',next:'Revisar pendência documental',csat:2},
+  {name:'Daniela Alves',stage:'Contratação',score:92,status:'healthy',last:1,pending:'Nenhuma',next:'Confirmar conclusão da contratação',csat:5},
+  {name:'Gustavo Ribeiro',stage:'Necessidade',score:80,status:'healthy',last:0,pending:'Nenhuma',next:'Realizar primeiro atendimento'},
+  {name:'Paula Mendes',stage:'Retorno da instituição',score:38,status:'high',last:16,pending:'Documento pendente há 16 dias',next:'Retomar contato e revisar pendência',csat:2,comment:'Fiquei insegura por não saber se precisava fazer algo.'},
+  {name:'Vinícius Souza',stage:'Pós-atendimento',score:94,status:'healthy',last:1,pending:'Nenhuma',next:'Encerrar acompanhamento',csat:4,nps:9,comment:'A visualização das etapas foi útil.'}
+];
+
+const seedClients = seedData.map(createSeedClient);
 
 function normalizeClient(client, index = 0) {
   return {
@@ -205,21 +248,44 @@ function normalizeClient(client, index = 0) {
   };
 }
 
+function cloneSeedClients() {
+  return seedClients.map((client, index) => normalizeClient(JSON.parse(JSON.stringify(client)), index));
+}
+
+function mergeSeedEnhancements(existingClients, previousVersion = 0) {
+  const normalized = existingClients.map(normalizeClient);
+  const byId = new Map(normalized.map(client => [client.id, client]));
+
+  seedClients.forEach((seed, index) => {
+    const current = byId.get(seed.id);
+    if (!current) {
+      normalized.push(normalizeClient(JSON.parse(JSON.stringify(seed)), index));
+      return;
+    }
+
+    if (previousVersion < 6 && current.surveys.length === 0 && seed.surveys.length) {
+      current.surveys = JSON.parse(JSON.stringify(seed.surveys));
+    }
+  });
+
+  return normalized;
+}
+
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      return { version: STORAGE_VERSION, clients: seedClients };
+      return { version: STORAGE_VERSION, clients: cloneSeedClients() };
     }
     const parsed = JSON.parse(raw);
     if (!parsed || !Array.isArray(parsed.clients)) throw new Error('Estrutura inválida');
     return {
       version: STORAGE_VERSION,
-      clients: parsed.clients.map(normalizeClient)
+      clients: mergeSeedEnhancements(parsed.clients, Number(parsed.version) || 0)
     };
   } catch (error) {
     console.warn('Não foi possível carregar a persistência local. A massa fictícia foi restaurada.', error);
-    return { version: STORAGE_VERSION, clients: seedClients };
+    return { version: STORAGE_VERSION, clients: cloneSeedClients() };
   }
 }
 
@@ -227,6 +293,7 @@ let state = loadState();
 let clients = state.clients;
 let view = 'dashboard';
 let currentClientId = null;
+let customerClientId = clients[0]?.id || null;
 const app = document.querySelector('#app');
 
 function recalculateClientHealth(c) {
@@ -259,18 +326,12 @@ function resetDemoData() {
   const ok = window.confirm('Restaurar os dados fictícios iniciais do Jornada360 neste navegador?');
   if (!ok) return;
   localStorage.removeItem(STORAGE_KEY);
-  clients = [
-    {name:'Mariana Costa',stage:'Documentação',score:68,status:'attention',last:3,pending:'Comprovante complementar',next:'Confirmar recebimento do documento'},
-    {name:'Carlos Mendes',stage:'Documentação',score:42,status:'high',last:11,pending:'Documento pendente há 11 dias',next:'Confirmar dificuldade no envio'},
-    {name:'Fernanda Lima',stage:'Análise',score:47,status:'high',last:15,pending:'Sem interação há 15 dias',next:'Realizar contato de acompanhamento'},
-    {name:'Pedro Alves',stage:'Diagnóstico',score:73,status:'attention',last:2,pending:'Nova solicitação documental',next:'Orientar sobre documento solicitado'},
-    {name:'Ana Ribeiro',stage:'Análise',score:76,status:'attention',last:8,pending:'Etapa sem atualização há 8 dias',next:'Verificar andamento e atualizar status'},
-    {name:'Luiza Rocha',stage:'Preparação para contrato',score:91,status:'healthy',last:1,pending:'Nenhuma',next:'Orientar etapa final'},
-    {name:'Rafael Souza',stage:'Pós-atendimento',score:95,status:'healthy',last:0,pending:'Nenhuma',next:'Coletar NPS'}
-  ].map(createSeedClient);
+  clients = cloneSeedClients();
+  recalculateAllHealth();
   saveState();
   view = 'dashboard';
   currentClientId = null;
+  customerClientId = clients[0]?.id || null;
   render();
 }
 
@@ -320,6 +381,37 @@ function healthBreakdownMarkup(health) {
 function getPriorityList() {
   recalculateAllHealth();
   return JornadaPriorities.buildPriorityList(clients, stages);
+}
+
+function getPortfolioAnalytics() {
+  recalculateAllHealth();
+  return {
+    portfolio: JornadaAnalytics.portfolioMetrics(clients),
+    surveys: JornadaAnalytics.surveyMetrics(clients),
+    frictions: JornadaAnalytics.frictionMetrics(clients, stages),
+    stages: JornadaAnalytics.stageDistribution(clients, stages),
+    insight: JornadaAnalytics.buildPortfolioInsight(clients, stages),
+    comments: JornadaAnalytics.recentComments(clients, 8)
+  };
+}
+
+function formatNps(value) {
+  if (value === null || value === undefined) return '—';
+  return value > 0 ? `+${value}` : String(value);
+}
+
+function latestSurvey(c, type) {
+  return JornadaAnalytics.latestSurvey(c, type);
+}
+
+function surveyScoreButtons(type, max, selected = null) {
+  const start = type === 'nps' ? 0 : 1;
+  return Array.from({ length: max - start + 1 }, (_, index) => start + index)
+    .map(score => `
+      <button type="button" class="survey-score ${selected === score ? 'selected' : ''}"
+        data-survey-type="${type}" data-survey-score="${score}"
+        aria-pressed="${selected === score ? 'true' : 'false'}">${score}</button>
+    `).join('');
 }
 
 function priorityLevelBadge(item) {
@@ -433,25 +525,26 @@ function addTimeline(c, type, title, detail) {
 
 function layout(content) {
   app.innerHTML = `
+    <a class="skip-link" href="#main-content">Ir para o conteúdo principal</a>
     <div class="shell">
       <aside class="side">
         <div class="brand">Jornada360</div>
         <div class="tag">CX • Customer Success</div>
-        <nav class="nav">
+        <nav class="nav" aria-label="Navegação principal">
           ${[
             ['dashboard', 'Visão geral'],
             ['clients', 'Clientes'],
             ['priorities', 'Prioridades'],
             ['cx', 'Voz do Cliente'],
             ['customer', 'Visão do cliente']
-          ].map(([v, l]) => `<button data-v="${v}" class="${view === v ? 'active' : ''}">${l}</button>`).join('')}
+          ].map(([v, l]) => `<button type="button" data-v="${v}" class="${view === v ? 'active' : ''}" ${view === v ? 'aria-current="page"' : ''}>${l}</button>`).join('')}
         </nav>
         <div class="side-footer">
-          <span id="save-indicator">Dados fictícios salvos localmente</span>
-          <button class="reset-btn" id="reset-demo">Restaurar demonstração</button>
+          <span id="save-indicator" aria-live="polite">Dados fictícios salvos localmente</span>
+          <button type="button" class="reset-btn" id="reset-demo">Restaurar demonstração</button>
         </div>
       </aside>
-      <main class="main">${content}</main>
+      <main class="main" id="main-content" tabindex="-1">${content}</main>
     </div>`;
 
   document.querySelectorAll('[data-v]').forEach(button => {
@@ -467,23 +560,25 @@ function layout(content) {
 }
 
 function dashboard() {
-  recalculateAllHealth();
+  const analytics = getPortfolioAnalytics();
+  const p = analytics.portfolio;
+  const insight = analytics.insight;
+  const survey = analytics.surveys;
+
   layout(`
     <div class="top">
       <div>
         <h1>Visão geral da carteira</h1>
-        <p class="sub">Quem precisa de atenção e quais atritos estão afetando a jornada?</p>
+        <p class="sub">Indicadores calculados a partir da carteira fictícia salva neste navegador.</p>
       </div>
-      <span class="pill">Ambiente demonstrativo • dados fictícios</span>
+      <span class="pill">${p.total} clientes fictícios • dados locais</span>
     </div>
 
-    <section class="grid4">
-      ${[
-        ['38', 'Clientes ativos'],
-        ['22', 'Jornadas saudáveis'],
-        ['11', 'Em atenção'],
-        ['5', 'Necessitam acompanhamento']
-      ].map(x => `<div class="card metric"><strong>${x[0]}</strong><span>${x[1]}</span></div>`).join('')}
+    <section class="grid4" aria-label="Indicadores da carteira">
+      <div class="card metric"><strong>${p.total}</strong><span>Clientes na carteira</span></div>
+      <div class="card metric"><strong>${p.healthy}</strong><span>Jornadas saudáveis</span></div>
+      <div class="card metric"><strong>${p.attention}</strong><span>Em atenção</span></div>
+      <div class="card metric"><strong>${p.high}</strong><span>Necessitam acompanhamento</span></div>
     </section>
 
     <section class="cols">
@@ -500,10 +595,35 @@ function dashboard() {
           .map(item => priorityCardMarkup(item, true))
           .join('') || '<div class="empty">Nenhuma jornada exige acompanhamento agora.</div>'}
       </div>
+      <div class="card insight-card">
+        <h2>Insight CX da carteira</h2>
+        <span class="insight-kicker">${safeText(insight.title)}</span>
+        <p>${safeText(insight.summary)}</p>
+        <div class="insight-action"><b>Ação sugerida</b><br>${safeText(insight.action)}</div>
+        <p class="small">Regra determinística de apoio ao acompanhamento; não é decisão financeira automatizada.</p>
+      </div>
+    </section>
+
+    <section class="cols">
       <div class="card">
-        <h2>Insight CX</h2>
-        <p>Documentação é o principal ponto de atrito desta carteira demonstrativa.</p>
-        <p class="small">Ação sugerida: revisar orientações e acompanhar pendências antigas. A sugestão apoia o profissional; não toma decisões financeiras.</p>
+        <h2>Distribuição por etapa</h2>
+        <div class="stage-distribution">
+          ${analytics.stages.map(item => `
+            <div class="distribution-row">
+              <div><b>${safeText(item.stage)}</b><span>${item.count}</span></div>
+              <div class="distribution-track"><i style="width:${item.percent}%"></i></div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <h2>Voz do Cliente — resumo</h2>
+        <div class="voc-summary-grid">
+          <div><strong>${survey.csatAverage === null ? '—' : `${survey.csatAverage.toFixed(1).replace('.', ',')}/5`}</strong><span>CSAT • ${survey.csatCount} resposta(s)</span></div>
+          <div><strong>${formatNps(survey.nps)}</strong><span>NPS • ${survey.npsCount} resposta(s)</span></div>
+          <div><strong>${survey.completionRate}%</strong><span>Jornadas em pós-atendimento</span></div>
+          <div><strong>${survey.totalResponses}</strong><span>Respostas registradas</span></div>
+        </div>
       </div>
     </section>
   `);
@@ -997,48 +1117,73 @@ function priorities() {
 }
 
 function cx() {
+  const analytics = getPortfolioAnalytics();
+  const survey = analytics.surveys;
+  const frictions = analytics.frictions;
+  const comments = analytics.comments;
+
   layout(`
     <div class="top">
       <div>
         <h1>Voz do Cliente</h1>
-        <p class="sub">Feedback transformado em aprendizado sobre a jornada.</p>
+        <p class="sub">CSAT, NPS, comentários e atritos calculados a partir dos registros fictícios do MVP.</p>
       </div>
+      <span class="pill">${survey.totalResponses} resposta(s) registradas</span>
     </div>
     <div class="grid4">
-      <div class="card metric"><strong>4,3/5</strong><span>CSAT demonstrativo</span></div>
-      <div class="card metric"><strong>+42</strong><span>NPS demonstrativo</span></div>
-      <div class="card metric"><strong>76%</strong><span>Conclusão</span></div>
-      <div class="card metric"><strong>24%</strong><span>Interrupção</span></div>
+      <div class="card metric"><strong>${survey.csatAverage === null ? '—' : `${survey.csatAverage.toFixed(1).replace('.', ',')}/5`}</strong><span>CSAT • ${survey.csatCount} resposta(s)</span></div>
+      <div class="card metric"><strong>${formatNps(survey.nps)}</strong><span>NPS • ${survey.npsCount} resposta(s)</span></div>
+      <div class="card metric"><strong>${survey.completionRate}%</strong><span>Jornadas em pós-atendimento</span></div>
+      <div class="card metric"><strong>${survey.totalResponses}</strong><span>Respostas CSAT + NPS</span></div>
     </div>
     <section class="cols">
       <div class="card">
-        <h2>Atritos mais citados</h2>
-        <div class="reason">Documentação — 41%</div>
-        <div class="reason">Tempo de espera — 28%</div>
-        <div class="reason">Comunicação/status — 19%</div>
-        <div class="reason">Outros — 12%</div>
+        <h2>Atritos mais frequentes na carteira</h2>
+        ${frictions.length ? frictions.slice(0, 6).map(item => `
+          <div class="friction-row">
+            <div><b>${safeText(item.label)}</b><span>${item.affected} cliente(s) • ${item.percent}% da carteira</span></div>
+            <div class="friction-track"><i style="width:${item.percent}%"></i></div>
+          </div>
+        `).join('') : '<div class="empty">Nenhum fator de atenção identificado.</div>'}
+        <p class="small">Os atritos são derivados dos fatores do Journey Health Score; não usam atributos pessoais ou critérios de crédito.</p>
       </div>
       <div class="card">
-        <h2>Comentários fictícios</h2>
-        <p>“Gostei de saber exatamente o que faltava.”</p>
-        <p>“Queria receber atualização mesmo quando ainda estivesse aguardando.”</p>
-        <p class="small">A IA futura poderá classificar temas e resumir feedback, mas não decidirá questões financeiras.</p>
+        <h2>Comentários fictícios recentes</h2>
+        ${comments.length ? comments.map(item => `
+          <blockquote class="voc-comment">
+            <p>“${safeText(item.comment)}”</p>
+            <footer>${safeText(item.clientName)} • ${item.type.toUpperCase()} ${item.score}${item.type === 'csat' ? '/5' : '/10'} • ${formatDate(item.answeredAt)}</footer>
+          </blockquote>
+        `).join('') : '<div class="empty">Nenhum comentário registrado.</div>'}
       </div>
     </section>
+    <p class="notice">Feedbacks e métricas desta demonstração são fictícios. CSAT e NPS apoiam a melhoria da experiência e não interferem em decisões financeiras.</p>
   `);
 }
 
 function customer() {
-  const c = clients[0];
+  const c = getClient(customerClientId) || clients[0];
+  if (!c) return dashboard();
+  customerClientId = c.id;
+
   const activeDocs = c.documents.filter(d => d.status !== 'resolved');
   const progress = getJourneyProgress(c);
+  const latestCsat = latestSurvey(c, 'csat');
+  const latestNps = latestSurvey(c, 'nps');
+  const days = getDaysSinceLastInteraction(c);
 
   layout(`
     <div class="top">
       <div>
         <h1>Experiência mobile do cliente</h1>
-        <p class="sub">A tela deve responder: onde estou, preciso fazer algo e qual é o próximo passo?</p>
+        <p class="sub">Demonstração da visão do cliente com acompanhamento e pesquisas funcionais.</p>
       </div>
+      <label class="customer-selector">
+        Cliente fictício
+        <select id="customer-client-select">
+          ${clients.map(client => `<option value="${client.id}" ${client.id === c.id ? 'selected' : ''}>${safeText(client.name)}</option>`).join('')}
+        </select>
+      </label>
     </div>
 
     <div class="mobile-wrap">
@@ -1050,7 +1195,7 @@ function customer() {
           <span>Etapa ${progress.step} de ${progress.total}</span>
           <b>${progress.percent}%</b>
         </div>
-        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress.percent}">
+        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress.percent}" aria-label="Progresso da jornada">
           <i style="width:${progress.percent}%"></i>
         </div>
         <p><b>Etapa atual:</b> ${safeText(c.stage)}</p>
@@ -1059,24 +1204,118 @@ function customer() {
           <b>Você precisa fazer algo agora?</b>
           <h3>${activeDocs.length ? 'Sim' : 'Não'}</h3>
           <p>${activeDocs.length ? safeText(activeDocs[0].guidance || activeDocs[0].label) : 'Nenhuma ação documental pendente no momento.'}</p>
-          <button class="btn">Ver orientação</button>
+          ${activeDocs.length ? `<p class="small">Item: ${safeText(activeDocs[0].label)}</p>` : ''}
         </div>
 
         <div class="card">
           <b>Próximo passo</b>
           <p>${safeText(c.next)}</p>
-          <span class="small">Última atualização: ${getDaysSinceLastInteraction(c)} dia(s)</span>
+          <span class="small">Última interação: ${days === null ? 'não registrada' : `${days} dia(s)`}</span>
         </div>
 
-        <h3>Como foi sua experiência até aqui?</h3>
-        <div class="survey">
-          ${[1,2,3,4,5].map(n => `<button>${n}</button>`).join('')}
-        </div>
+        <section class="mobile-survey-section">
+          <h3>Como foi sua experiência até aqui?</h3>
+          <p class="small">CSAT • escolha uma nota de 1 a 5.</p>
+          <form id="csat-form" class="survey-form">
+            <div class="survey" role="group" aria-label="Nota CSAT de 1 a 5">
+              ${surveyScoreButtons('csat', 5, latestCsat ? Number(latestCsat.score) : null)}
+            </div>
+            <label>
+              Comentário opcional
+              <textarea id="csat-comment" rows="2" maxlength="300" placeholder="Conte brevemente como foi sua experiência">${safeText(latestCsat?.comment || '')}</textarea>
+            </label>
+            <button class="btn alt" type="submit">Salvar CSAT</button>
+          </form>
+        </section>
 
+        ${c.stage === 'Pós-atendimento' ? `
+          <section class="mobile-survey-section">
+            <h3>Você recomendaria esta experiência?</h3>
+            <p class="small">NPS • escolha uma nota de 0 a 10.</p>
+            <form id="nps-form" class="survey-form">
+              <div class="survey nps-scale" role="group" aria-label="Nota NPS de 0 a 10">
+                ${surveyScoreButtons('nps', 10, latestNps ? Number(latestNps.score) : null)}
+              </div>
+              <label>
+                Comentário opcional
+                <textarea id="nps-comment" rows="2" maxlength="300" placeholder="O que mais influenciou sua nota?">${safeText(latestNps?.comment || '')}</textarea>
+              </label>
+              <button class="btn alt" type="submit">Salvar NPS</button>
+            </form>
+          </section>
+        ` : `
+          <div class="survey-locked">
+            <b>NPS no encerramento</b>
+            <p class="small">A pesquisa NPS fica disponível quando a jornada chega ao pós-atendimento.</p>
+          </div>
+        `}
+
+        <div id="survey-feedback" class="survey-feedback" aria-live="polite"></div>
         <p class="notice">Demonstração de portfólio. O acompanhamento exibido não representa aprovação ou decisão de instituição financeira.</p>
       </div>
     </div>
   `);
+
+  document.querySelector('#customer-client-select').onchange = event => {
+    customerClientId = event.target.value;
+    customer();
+  };
+
+  const bindScale = type => {
+    document.querySelectorAll(`[data-survey-type="${type}"]`).forEach(button => {
+      button.onclick = () => {
+        document.querySelectorAll(`[data-survey-type="${type}"]`).forEach(item => {
+          item.classList.remove('selected');
+          item.setAttribute('aria-pressed', 'false');
+        });
+        button.classList.add('selected');
+        button.setAttribute('aria-pressed', 'true');
+      };
+    });
+  };
+
+  const saveSurvey = (type, commentId) => {
+    const selected = document.querySelector(`[data-survey-type="${type}"].selected`);
+    const feedback = document.querySelector('#survey-feedback');
+    if (!selected) {
+      feedback.textContent = `Escolha uma nota para ${type.toUpperCase()} antes de salvar.`;
+      return false;
+    }
+
+    const score = Number(selected.dataset.surveyScore);
+    const comment = document.querySelector(commentId)?.value.trim() || '';
+    const now = new Date().toISOString();
+    const existing = latestSurvey(c, type);
+
+    if (existing) {
+      existing.score = score;
+      existing.comment = comment;
+      existing.answeredAt = now;
+    } else {
+      c.surveys.push({ id: uid('survey'), type, score, comment, answeredAt: now });
+    }
+
+    addTimeline(c, 'survey', `${type.toUpperCase()} registrado`, `Nota ${score}/${type === 'csat' ? 5 : 10}${comment ? ` • ${comment}` : ''}`);
+    saveState();
+    feedback.textContent = `${type.toUpperCase()} salvo neste navegador.`;
+    window.setTimeout(() => customer(), 500);
+    return true;
+  };
+
+  bindScale('csat');
+  document.querySelector('#csat-form').onsubmit = event => {
+    event.preventDefault();
+    saveSurvey('csat', '#csat-comment');
+  };
+
+  const npsForm = document.querySelector('#nps-form');
+  if (npsForm) {
+    bindScale('nps');
+    npsForm.onsubmit = event => {
+      event.preventDefault();
+      saveSurvey('nps', '#nps-comment');
+    };
+  }
 }
 
 function render() {
